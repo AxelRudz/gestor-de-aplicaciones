@@ -1,11 +1,13 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron/main')
-const path = require('node:path')
+const { app, BrowserWindow, dialog, ipcMain } = require('electron/main')
+const path = require('path')
+
+let win;
 
 function createWindow () {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     title: "Gestor de aplicaciones",
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
     resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -16,31 +18,9 @@ function createWindow () {
 
   win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`);
 
-  //win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
-  const template = [
-    {
-      label: "Agregar aplicación...",
-      submenu: [
-        {
-          label: "Angular",
-          role: "Angular",
-        },
-        {
-          label: "Spring-Boot",
-          role:"Springboot"
-        }
-      ]
-    },
-    {
-      label: "Salir",
-      click: () => win.close()
-    },
-  ]
-
-  const menu = Menu.buildFromTemplate(template)
-
-  Menu.setApplicationMenu(menu);
+  win.setMenu(null);
 
 }
 
@@ -60,4 +40,18 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.on("ping", (event) => event.reply("pong", "pong"));
+ipcMain.on('abrir-ventana-seleccionar-archivo', async (event) => {
+  try {
+    const result = await dialog.showOpenDialog(win, {
+      properties: ['openFile'],
+      filters: [{ name: 'All Files', extensions: ['*'] }]
+    });
+
+    if (result.canceled === false) {
+      const filePath = result.filePaths[0];
+      event.sender.send('ruta', filePath);
+    }
+  } catch (err) {
+    console.error('Error opening dialog:', err);
+  }
+});
