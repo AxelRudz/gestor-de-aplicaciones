@@ -1,8 +1,11 @@
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { ElectronService } from './services/electron.service';
 import { Aplicacion } from './modelo/Aplicacion';
 import { AngularApp } from './modelo/AngularApp';
 import { SpringApp } from './modelo/AngularApp copy';
+import { FormBuilder, Validators } from '@angular/forms';
+import { AplicacionService } from './services/aplicacion.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,58 +13,90 @@ import { SpringApp } from './modelo/AngularApp copy';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+
+  @ViewChild("btnCerrar") btnCerrar!: ElementRef;
+
   title = 'gestor-de-aplicaciones';
 
-  rutaArchivoElegida = "";
+  aplicaciones: Aplicacion[] = [];
 
-  @ViewChild("inputTipo") inputTipo!: ElementRef;
-  @ViewChild("inputNombre") inputNombre!: ElementRef;
-  @ViewChild("inputPuerto") inputPuerto!: ElementRef;
-  @ViewChild("inputRuta") inputRuta!: ElementRef;
+  nombresRamas: {ruta: string, nombre: string}[] = [];
 
-  aplicaciones: Aplicacion[] = [
-    new AngularApp("App 1", 4200, ""),
-    new SpringApp("App 1", 8080, ""),
-    new AngularApp("App 3", 4400, ""),
-  ]
+  formularioAgregarAplicacion = this.fb.group({
+    tipo: ["angular", [Validators.required]],
+    nombre: ["", [Validators.required]],
+    puerto: ["", [Validators.required]],
+    ruta: ["", [Validators.required]],
+  });
+
+  suscripcion!: Subscription;
 
   constructor(
     private electronService: ElectronService,
-    private cdRef: ChangeDetectorRef
-  ) {
-    this.electronService.on('file-path-response', (event: any, filePath: any) => {
-      console.log('File path:', filePath);
-      // Ahora puedes usar filePath como desees
-    });
-  }
+    private aplicacionService: AplicacionService,
+    private cdRef: ChangeDetectorRef,
+    private fb: FormBuilder,
+    private renderer: Renderer2,
+  ) {}
 
-  verRutaDeArchivo(archivo: any){
-    this.electronService.send("pedido-ver-archivo", archivo);
-    this.electronService.on("respuesta-ver-archivo", (event: any, arg: string) => {
-      this.rutaArchivoElegida = arg;
-      this.cdRef.detectChanges();
-    });
+  ngOnInit(){
+    this.suscripcion = this.aplicacionService.aplicacionesSubject.subscribe(aplicaciones => {
+      this.aplicaciones = aplicaciones;
+      this.aplicaciones.forEach(app => this.obtenerRamaActual(app));
+    })
   }
 
   ngOnDestroy(): void {
-    this.electronService.removeAllListeners("respuesta-ver-archivo");
-  }
-
-  agregarAplicacion(){
-
-    const tipo = this.inputTipo.nativeElement.value;
-    const nombre = this.inputNombre.nativeElement.value;
-    const puerto = this.inputPuerto.nativeElement.value;
-    const archivo = this.inputRuta.nativeElement.value;
-
-    this.verRutaDeArchivo(archivo)
+    this.suscripcion.unsubscribe();
+    this.electronService.removeAllListeners("ruta");
   }
 
   abrirDialogRuta() {
-    this.electronService.send('abrir-ventana-seleccionar-archivo');
-    this.electronService.on("ruta", (event: any, arg: string) => {
-      this.rutaArchivoElegida = arg;
+    this.electronService.send('abrir-ventana-seleccion-directorio');
+    this.electronService.on("ruta", (event: any, ruta: string) => {
+      this.formularioAgregarAplicacion.get("ruta")?.setValue(ruta);
+      this.formularioAgregarAplicacion.updateValueAndValidity();
       this.cdRef.detectChanges();
     });
+  }
+
+  agregarAplicacion(){
+    if(this.formularioAgregarAplicacion.valid){
+      const f = this.formularioAgregarAplicacion;
+      const tipo = f.get('tipo')!.value;
+      const nombre = f.get('nombre')!.value!;
+      const puerto = f.get('puerto')!.value!;
+      const ruta = f.get('ruta')!.value!;
+
+      tipo == "angular"
+      ? this.aplicacionService.agregarAplicacion(new AngularApp(nombre, Number.parseInt(puerto), ruta)) 
+      : this.aplicacionService.agregarAplicacion(new SpringApp(nombre, Number.parseInt(puerto), ruta));        
+
+      this.renderer.selectRootElement(this.btnCerrar.nativeElement).click(); 
+    }
+    else {
+      alert("Formulario inválido.");
+    }
+  }
+
+  obtenerRamaActual(app: Aplicacion){
+    this.electronService.send('obtener-rama-git', app.getRuta());
+    this.electronService.on("respuesta-rama-git", (event: any, response: {ruta: string, nombre: string}) => {
+      const rutaYaExistente = this.nombresRamas.find(ruta => ruta.ruta == response.nombre);
+      if(rutaYaExistente){
+        rutaYaExistente.nombre = response.nombre;
+      }
+      else {
+        this.nombresRamas.push(response);
+      }
+    })
+  }
+
+  getNombreRama(app: Aplicacion){
+    const existeRama = this.nombresRamas.find(ramasGuardadas => ramasGuardadas.ruta == app.getRuta());
+    if(existeRama){
+      return existeRama.nombre;
+    }
+    return "No disponible";
   }
 }

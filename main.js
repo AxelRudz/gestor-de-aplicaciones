@@ -1,14 +1,15 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron/main')
 const path = require('path')
+const { exec } = require('child_process');
 
 let win;
 
 function createWindow () {
   win = new BrowserWindow({
     title: "Gestor de aplicaciones",
-    width: 1200,
-    height: 800,
-    resizable: false,
+    width: 800,
+    height: 600,
+    resizable: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: false,
@@ -40,11 +41,10 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.on('abrir-ventana-seleccionar-archivo', async (event) => {
+ipcMain.on('abrir-ventana-seleccion-directorio', async (event) => {
   try {
     const result = await dialog.showOpenDialog(win, {
-      properties: ['openFile'],
-      filters: [{ name: 'All Files', extensions: ['*'] }]
+      properties: ['openDirectory'],
     });
 
     if (result.canceled === false) {
@@ -54,4 +54,23 @@ ipcMain.on('abrir-ventana-seleccionar-archivo', async (event) => {
   } catch (err) {
     console.error('Error opening dialog:', err);
   }
+});
+
+ipcMain.on('obtener-rama-git', async (event, ruta) => {
+  const command = `git -C "${ruta}" rev-parse --abbrev-ref HEAD`;
+
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      event.sender.send('respuesta-rama-git', {ruta: ruta, nombre: "No identificada"});
+      return;
+    }
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+      event.sender.send('respuesta-rama-git', {ruta: ruta, nombre: "No identificada"});
+      return;
+    }
+    const nombreRama = stdout.trim();
+    event.sender.send('respuesta-rama-git', {ruta: ruta, nombre: nombreRama});
+  });
 });
