@@ -1,0 +1,41 @@
+<!-- Modal -->
+<div class="modal fade" id="modalAgregarApp" tabindex="-1" aria-labelledby="modalAgregarAppLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalAgregarAppLabel">Agregar aplicación</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form [formGroup]="formularioAgregarAplicacion" class="modal-body">
+
+        <label for="tipoApp" class="form-label mt-2">Tipo de aplicación</label>
+        <select id="tipoApp" class="form-select mt-1" formControlName="tipo">
+          <option value="angular" selected>
+            Angular
+          </option>
+          <option value="springboot">Spring-Boot</option>
+        </select>
+
+        <label for="nombreApp" class="form-label mt-3">Nombre</label>
+        <input id="nombreApp" class="form-control" type="text" placeholder="Nombre..." formControlName="nombre">
+
+        <label for="puertoApp" class="form-label mt-3">Puerto</label>
+        <input id="puertoApp" class="form-control" type="text" placeholder="Número de puerto..." formControlName="puerto">
+
+        <div class="d-flex align-items-center">
+          <button class="btn btn-primary mt-3 me-2" (click)="abrirDialogRuta()">
+            <i class="fa-solid fa-folder-open"></i>
+            Seleccionar carpeta raíz
+          </button>        
+          {{formularioAgregarAplicacion.get('ruta')?.value}}
+        </div>
+        
+
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="agregarAplicacion()" [disabled]="formularioAgregarAplicacion.invalid">Agregar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" #btnCerrar>Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

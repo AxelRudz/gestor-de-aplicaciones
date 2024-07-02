@@ -48,4 +48,13 @@ export class ElectronService {
     this.ipc.removeAllListeners(channel);
   }
 
+  public removeListener(chanel: string, listener: any){
+    if (!this.ipc){
+      return;
+    }
+    this.ipc.removeListener('respuesta-rama-git', listener);
+
+  }
+
+   
 }
