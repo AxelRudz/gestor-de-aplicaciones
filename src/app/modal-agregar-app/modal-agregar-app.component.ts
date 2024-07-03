@@ -44,17 +44,20 @@ export class ModalAgregarAppComponent {
 
   agregarAplicacion(){
     if(this.formularioAgregarAplicacion.valid){
+      
       const f = this.formularioAgregarAplicacion;
       const tipo = f.get('tipo')!.value;
       const nombre = f.get('nombre')!.value!;
       const puerto = f.get('puerto')!.value!;
       const ruta = f.get('ruta')!.value!;
 
-      tipo == "angular"
-      ? this.aplicacionService.agregarAplicacion(new AngularApp(nombre, Number.parseInt(puerto), ruta)) 
-      : this.aplicacionService.agregarAplicacion(new SpringApp(nombre, Number.parseInt(puerto), ruta));        
-
-      this.renderer.selectRootElement(this.btnCerrar.nativeElement).click(); 
+      if(!this.aplicacionService.aplicaciones.some(app => app.getNombre() == nombre)){
+        tipo == "angular"
+        ? this.aplicacionService.agregarAplicacion(new AngularApp(nombre, Number.parseInt(puerto), ruta)) 
+        : this.aplicacionService.agregarAplicacion(new SpringApp(nombre, Number.parseInt(puerto), ruta));        
+  
+        this.renderer.selectRootElement(this.btnCerrar.nativeElement).click(); 
+      }      
     }
     else {
       alert("Formulario inválido.");

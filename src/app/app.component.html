@@ -5,11 +5,18 @@
  -->
 
 
-<button class="btn btn-primary d-block mx-auto my-5" data-bs-toggle="modal" data-bs-target="#modalAgregarApp">
-  Agregar aplicacion
-</button>
-
-<app-tabla-aplicaciones></app-tabla-aplicaciones>
-
-<app-modal-agregar-app></app-modal-agregar-app>
-
+<div class="container">
+  <button class="btn btn-primary d-block mx-auto my-5" data-bs-toggle="modal" data-bs-target="#modalAgregarApp">
+    <i class="fa-solid fa-plus me-2"></i>
+    Agregar aplicacion
+  </button>
+  
+  <app-tabla-aplicaciones></app-tabla-aplicaciones>
+  
+  <app-modal-agregar-app></app-modal-agregar-app>
+  
+  <ng-container *ngIf="apps.length > 0">
+    <h2 class="mt-5 mb-3">Terminales apps</h2>
+    <app-terminales-apps></app-terminales-apps>
+  </ng-container>
+</div>

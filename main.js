@@ -1,6 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron/main')
 const path = require('path')
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 
 let win;
 
@@ -73,4 +73,30 @@ ipcMain.on('obtener-rama-git', async (event, ruta) => {
     const nombreRama = stdout.trim();
     event.sender.send('respuesta-rama-git', {ruta: ruta, nombre: nombreRama});
   });
+});
+
+ipcMain.on('iniciar-app-angular', async (event, {nombreApp, ruta, puerto}) => {
+  
+  const comando = `cd ${ruta} && ng serve --port ${puerto}`;
+
+  const child = spawn(comando, {
+    shell: true,
+  });
+
+  child.stdout.on('data', (data) => {
+    // Enviar datos a Angular (a través de IPC o como prefieras)
+    console.log(`stdout: ${data}`);
+    event.sender.send(`respuesta-inicio-app-angular-${nombreApp}`, data.toString());
+  });
+
+  child.stderr.on('data', (error) => {
+    console.error(`stderr: ${error}`);
+    event.sender.send(`respuesta-inicio-app-angular-${nombreApp}`, error.toString());
+  });
+
+  child.on('close', (code) => {
+    console.log(`Proceso hijo terminado con código ${code}`);
+    event.sender.send(`respuesta-inicio-app-angular-${nombreApp}`, "");
+  });
+
 });

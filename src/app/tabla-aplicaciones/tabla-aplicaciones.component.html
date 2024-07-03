@@ -34,7 +34,7 @@
         <button
           *ngIf="!app.estaEnEjecucion()"
           class="btn btn-primary"
-          (click)="app.setEnEjecucion(true)">
+          (click)="iniciarApp(app)">
           <i class="fa-solid fa-play me-2"></i>
           Iniciar
         </button>

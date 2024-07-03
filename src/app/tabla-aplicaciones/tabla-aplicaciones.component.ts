@@ -58,6 +58,18 @@ export class TablaAplicacionesComponent {
     return "No disponible";
   }
 
+  iniciarApp(app: Aplicacion){
+    const nombreApp = app.getNombre();
+    const ruta = app.getRuta();
+    const puerto = app.getPuerto();
+
+    this.electronService.send("iniciar-app-angular", {nombreApp, ruta, puerto})
+    this.electronService.on(`respuesta-inicio-app-angular-${nombreApp}`, (event: any, response: string) => {
+      console.log("Recibi una respuesta al iniciar la app");
+      app.agregarMensajeTerminal(response);
+    });
+  }
+
 
 
 }

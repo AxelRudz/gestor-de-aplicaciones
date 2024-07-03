@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TablaAplicacionesComponent } from './tabla-aplicaciones/tabla-aplicaciones.component';
 import { ModalAgregarAppComponent } from './modal-agregar-app/modal-agregar-app.component';
+import { TerminalesAppsComponent } from './terminales-apps/terminales-apps.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TablaAplicacionesComponent,
-    ModalAgregarAppComponent
+    ModalAgregarAppComponent,
+    TerminalesAppsComponent
   ],
   imports: [
     BrowserModule,
