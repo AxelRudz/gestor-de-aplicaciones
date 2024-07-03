@@ -13,11 +13,9 @@ export class TablaAplicacionesComponent {
 
   aplicaciones: Aplicacion[] = [];
 
-  diccionarioNombresRamas: {ruta: string, nombre: string}[] = [];
-
   suscripcion!: Subscription;
 
-  timerRamas: any;
+  timerEstadoApp: any;
 
   constructor(
     private aplicacionService: AplicacionService,
@@ -27,46 +25,59 @@ export class TablaAplicacionesComponent {
   ngOnInit(){
     this.suscripcion = this.aplicacionService.aplicacionesSubject.subscribe(aplicaciones => {
       this.aplicaciones = aplicaciones;
-      this.aplicaciones.forEach(app => this.obtenerRamaActual(app));
+      this.aplicaciones.forEach(app => {
+        this.electronService.removeAllListeners(`respuesta-rama-git-${app.getPuerto()}`);
+        this.escucharCambiosNombreRama(app)
+      });
     })
 
-    this.timerRamas = setInterval(()=>{
-      this.aplicaciones.forEach(app => this.obtenerRamaActual(app));
-    }, 5000);
+    this.timerEstadoApp = setInterval(()=>{
+      this.aplicaciones.forEach(app => {
+        this.getEstadoApp(app)
+      });
+    }, 4000);
   }
 
   ngOnDestroy(): void {
+    clearInterval(this.timerEstadoApp);
     this.suscripcion.unsubscribe();
-    this.electronService.removeAllListeners("respuesta-rama-git");
-  }
-
-  obtenerRamaActual(app: Aplicacion){    
-    this.electronService.send('obtener-rama-git', app.getRuta());
-    this.electronService.once("respuesta-rama-git", (event: any, response: {ruta: string, nombre: string}) => {
-      const laRamaYaEstaEnElDiccionario = this.diccionarioNombresRamas.find(ramaAgregada => ramaAgregada.ruta == response.ruta);
-      laRamaYaEstaEnElDiccionario
-        ? laRamaYaEstaEnElDiccionario.nombre = response.nombre
-        : this.diccionarioNombresRamas.push(response);
+    this.aplicaciones.forEach(app => {
+      this.electronService.removeAllListeners(`respuesta-rama-git-${app.getPuerto()}`)
     });
   }
 
-  mostrarRamaDesdeElDiccionario(app: Aplicacion){
-    const existeRama = this.diccionarioNombresRamas.find(ramasGuardadas => ramasGuardadas.ruta == app.getRuta());
-    if(existeRama){
-      return existeRama.nombre;
-    }
-    return "No disponible";
+  escucharCambiosNombreRama(app: Aplicacion){    
+    const puerto = app.getPuerto();
+    const ruta = app.getRuta();
+    this.electronService.send('obtener-rama-git', {puerto, ruta});
+    this.electronService.on(`respuesta-rama-git-${puerto}`, (event: any, response: {ruta: string, nombre: string}) => {
+      app.setNombreRamaGit(response.nombre);
+    });
+  }
+
+  getEstadoApp(app: Aplicacion){
+    this.electronService.send('obtener-estado-puerto', app.getPuerto());
+    this.electronService.once(`respuesta-estado-puerto-${app.getPuerto()}`, (event: any, response: boolean) => {
+      app.setEnEjecucion(response);
+    })
   }
 
   iniciarApp(app: Aplicacion){
-    const nombreApp = app.getNombre();
     const ruta = app.getRuta();
     const puerto = app.getPuerto();
 
-    this.electronService.send("iniciar-app-angular", {nombreApp, ruta, puerto})
-    this.electronService.on(`respuesta-inicio-app-angular-${nombreApp}`, (event: any, response: string) => {
-      console.log("Recibi una respuesta al iniciar la app");
+    this.electronService.send("iniciar-app-angular", {ruta, puerto})
+    this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, response: string) => {
       app.agregarMensajeTerminal(response);
+    });
+  }
+
+  detenerApp(app: Aplicacion){
+    this.electronService.send("detener-app-angular", app.getPuerto());
+    this.electronService.once(`respuesta-detener-app-angular-${app.getPuerto()}`, (event: any, ok: boolean) => {
+      if(ok){
+        app.setEnEjecucion(false);
+      }
     });
   }
 

@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ElectronService } from '../services/electron.service';
 import { AplicacionService } from '../services/aplicacion.service';
 import { AngularApp } from '../modelo/AngularApp';
-import { SpringApp } from '../modelo/AngularApp copy';
+import { SpringApp } from '../modelo/SpringApp';
 
 @Component({
   selector: 'app-modal-agregar-app',

@@ -5,6 +5,7 @@ export abstract class Aplicacion {
   private ruta: string;
   private enEjecucion: boolean;
   private terminal: string;
+  private nombreRamaGit: string;
 
   constructor(nombre: string, puerto: number, ruta: string){
     this.nombre = nombre;
@@ -12,6 +13,7 @@ export abstract class Aplicacion {
     this.ruta = ruta;
     this.enEjecucion = false;
     this.terminal = "";
+    this.nombreRamaGit = "No disponible";
   }
 
   abstract getUrlLogo(): string;
@@ -54,6 +56,14 @@ export abstract class Aplicacion {
 
   getTerminal(): string {
     return this.terminal;
+  }
+
+  getRamaGit(): string {
+    return this.nombreRamaGit;
+  }
+
+  setNombreRamaGit(nombre: string): void {
+    this.nombreRamaGit = nombre;
   }
 
 }
