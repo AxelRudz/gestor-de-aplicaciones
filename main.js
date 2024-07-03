@@ -1,6 +1,11 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron/main')
+const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 const { exec, spawn } = require('child_process');
+
+require('electron-reload')(path.join(__dirname, 'dist'), {
+  electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
+  hardResetMethod: 'exit'
+});
 
 let win;
 
@@ -17,7 +22,7 @@ function createWindow () {
     }
   })
 
-  win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`);
+  win.loadURL(`http://localhost:4200`);
 
   win.webContents.openDevTools();
 
