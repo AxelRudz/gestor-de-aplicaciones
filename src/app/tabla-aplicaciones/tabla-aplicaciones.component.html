@@ -18,8 +18,26 @@
       </td>
       <td>{{app.getPuerto()}}</td>
       <td>
-        <i class="fa-solid fa-code-branch me-2"></i>
-        {{app.getRamaGit()}}
+        <button *ngIf="!hayMuchasRamas(app)" class="btn btn-outline-dark">
+          <i class="fa-solid fa-code-branch me-2"></i>
+          {{app.getRamaGit()}}
+        </button>
+        <div *ngIf="hayMuchasRamas(app)" class="dropdown">
+          <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-code-branch me-2"></i>
+            {{app.getRamaGit()}}
+          </button>
+          <ul class="dropdown-menu dropdown-menu">
+            <ng-container *ngFor="let rama of app.getInfoRamas()!.ramas; let i = index">
+              <li *ngIf="!rama.includes('origin/HEAD')" (click)="cambiarDeRama(app, rama)">
+                <a class="dropdown-item" href="#">
+                  <i class="fa-solid fa-code-branch me-2"></i>
+                  {{rama}}
+                </a>
+              </li>
+            </ng-container>
+          </ul>
+        </div>
       </td>
       <td>{{app.estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
       <td>

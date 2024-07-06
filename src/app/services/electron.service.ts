@@ -47,5 +47,9 @@ export class ElectronService {
     }
     this.ipc.removeAllListeners(channel);
   }
+
+  public invoke(channel: string, ...args: any[]): Promise<any>{
+    return this.ipc.invoke(channel, args)
+  }
    
 }

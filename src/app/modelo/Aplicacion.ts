@@ -1,3 +1,8 @@
+export interface AppInfoRamasGit {
+  ramas: string[],
+  tieneCambios: boolean
+}
+
 export abstract class Aplicacion {
 
   private nombre: string;
@@ -6,6 +11,7 @@ export abstract class Aplicacion {
   private enEjecucion: boolean;
   private terminal: string;
   private nombreRamaGit: string;
+  private infoRamas: AppInfoRamasGit | null;
 
   constructor(nombre: string, puerto: number, ruta: string){
     this.nombre = nombre;
@@ -14,6 +20,7 @@ export abstract class Aplicacion {
     this.enEjecucion = false;
     this.terminal = "";
     this.nombreRamaGit = "No disponible";
+    this.infoRamas = null;
   }
 
   abstract getUrlLogo(): string;
@@ -69,5 +76,15 @@ export abstract class Aplicacion {
   setNombreRamaGit(nombre: string): void {
     this.nombreRamaGit = nombre;
   }
+
+  getInfoRamas(): AppInfoRamasGit | null {
+    return this.infoRamas;
+  }
+
+  setInfoRamas(info: AppInfoRamasGit | null){
+    this.infoRamas = info;
+  }
+
+
 
 }

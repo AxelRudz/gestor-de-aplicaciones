@@ -25,9 +25,6 @@ export class TablaAplicacionesComponent {
   ngOnInit(){
     this.suscripcion = this.aplicacionService.aplicacionesSubject.subscribe(aplicaciones => {
       this.aplicaciones = aplicaciones;
-      this.aplicaciones.forEach(app => {
-        this.escucharCambiosNombreRama(app)
-      });
     })
   }
 
@@ -36,38 +33,25 @@ export class TablaAplicacionesComponent {
     this.aplicaciones.forEach(app => {
       this.electronService.removeAllListeners(`respuesta-rama-git-${app.getPuerto()}`)
     });
-  }
-
-  escucharCambiosNombreRama(app: Aplicacion){    
-    const puerto = app.getPuerto();
-    const ruta = app.getRuta();
-    this.electronService.send('obtener-rama-git', {puerto, ruta});
-    this.electronService.on(`respuesta-rama-git-${puerto}`, (event: any, response: {ruta: string, nombre: string}) => {
-      app.setNombreRamaGit(response.nombre);
-    });
-  }
+  }  
 
   iniciarApp(app: Aplicacion){
-    const ruta = app.getRuta();
-    const puerto = app.getPuerto();
-
-    this.electronService.send("iniciar-app-angular", {ruta, puerto})
-    this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, mensajeTerminal: string) => {  
-      app.setEnEjecucion(true);
-      app.agregarMensajeTerminal(mensajeTerminal);
-      this.aplicacionService.actualizarAplicacion(app);
-    });
+    this.aplicacionService.iniciarApp(app);
   }
 
   detenerApp(app: Aplicacion){
-    this.electronService.send("detener-app-angular", app.getPuerto());
-    this.electronService.once(`respuesta-detener-app-angular-${app.getPuerto()}`, (event: any, ok: boolean) => {
-      if(ok){
-        app.setEnEjecucion(false);
-        app.setTerminal("Se detuvo la aplicación.");
-        this.aplicacionService.actualizarAplicacion(app);
-      }
-    });
+    this.aplicacionService.detenerApp(app);
+  }
+
+  hayMuchasRamas(app: Aplicacion): boolean {
+    if(app.getInfoRamas()){
+      return app.getInfoRamas()!.ramas.length > 1;
+    }
+    return false;
+  }
+
+  cambiarDeRama(app: Aplicacion, rama: string){
+    this.aplicacionService.cambiarDeRama(app, rama);
   }
 
 

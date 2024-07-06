@@ -12,6 +12,10 @@ export class AppComponent {
 
   apps: Aplicacion[] = [];
 
+  timer = setInterval(() => {
+    this.aplicacionService.ejecutarTareasPeriodicas();
+  }, 3000);
+
   constructor(
     private aplicacionService: AplicacionService,
     private cdr: ChangeDetectorRef,
@@ -20,7 +24,6 @@ export class AppComponent {
   ngOnInit(){
     this.aplicacionService.aplicacionesSubject.asObservable().subscribe(aplicaciones => {
       this.apps = aplicaciones;
-      this.cdr.detectChanges();
     })
   }
 
