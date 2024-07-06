@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { AplicacionService } from './services/aplicacion.service';
 import { Aplicacion } from './modelo/Aplicacion';
 
@@ -12,11 +12,15 @@ export class AppComponent {
 
   apps: Aplicacion[] = [];
 
-  constructor(private aplicacionService: AplicacionService){}
+  constructor(
+    private aplicacionService: AplicacionService,
+    private cdr: ChangeDetectorRef,
+  ){}
 
   ngOnInit(){
     this.aplicacionService.aplicacionesSubject.asObservable().subscribe(aplicaciones => {
       this.apps = aplicaciones;
+      this.cdr.detectChanges();
     })
   }
 

@@ -58,6 +58,10 @@ export abstract class Aplicacion {
     return this.terminal;
   }
 
+  setTerminal(mensaje: string){
+    this.terminal = mensaje;
+  }
+
   getRamaGit(): string {
     return this.nombreRamaGit;
   }

@@ -55,7 +55,7 @@ export class ModalAgregarAppComponent {
         tipo == "angular"
         ? this.aplicacionService.agregarAplicacion(new AngularApp(nombre, Number.parseInt(puerto), ruta)) 
         : this.aplicacionService.agregarAplicacion(new SpringApp(nombre, Number.parseInt(puerto), ruta));        
-  
+        this.formularioAgregarAplicacion.reset();
         this.renderer.selectRootElement(this.btnCerrar.nativeElement).click(); 
       }      
     }

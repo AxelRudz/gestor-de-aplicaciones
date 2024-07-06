@@ -19,27 +19,19 @@ export class TablaAplicacionesComponent {
 
   constructor(
     private aplicacionService: AplicacionService,
-    private electronService: ElectronService,
+    private electronService: ElectronService
   ){}  
 
   ngOnInit(){
     this.suscripcion = this.aplicacionService.aplicacionesSubject.subscribe(aplicaciones => {
       this.aplicaciones = aplicaciones;
       this.aplicaciones.forEach(app => {
-        this.electronService.removeAllListeners(`respuesta-rama-git-${app.getPuerto()}`);
         this.escucharCambiosNombreRama(app)
       });
     })
-
-    this.timerEstadoApp = setInterval(()=>{
-      this.aplicaciones.forEach(app => {
-        this.getEstadoApp(app)
-      });
-    }, 4000);
   }
 
-  ngOnDestroy(): void {
-    clearInterval(this.timerEstadoApp);
+  ngOnDestroy(): void {    
     this.suscripcion.unsubscribe();
     this.aplicaciones.forEach(app => {
       this.electronService.removeAllListeners(`respuesta-rama-git-${app.getPuerto()}`)
@@ -55,20 +47,15 @@ export class TablaAplicacionesComponent {
     });
   }
 
-  getEstadoApp(app: Aplicacion){
-    this.electronService.send('obtener-estado-puerto', app.getPuerto());
-    this.electronService.once(`respuesta-estado-puerto-${app.getPuerto()}`, (event: any, response: boolean) => {
-      app.setEnEjecucion(response);
-    })
-  }
-
   iniciarApp(app: Aplicacion){
     const ruta = app.getRuta();
     const puerto = app.getPuerto();
 
     this.electronService.send("iniciar-app-angular", {ruta, puerto})
-    this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, response: string) => {
-      app.agregarMensajeTerminal(response);
+    this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, mensajeTerminal: string) => {  
+      app.setEnEjecucion(true);
+      app.agregarMensajeTerminal(mensajeTerminal);
+      this.aplicacionService.actualizarAplicacion(app);
     });
   }
 
@@ -77,6 +64,8 @@ export class TablaAplicacionesComponent {
     this.electronService.once(`respuesta-detener-app-angular-${app.getPuerto()}`, (event: any, ok: boolean) => {
       if(ok){
         app.setEnEjecucion(false);
+        app.setTerminal("Se detuvo la aplicación.");
+        this.aplicacionService.actualizarAplicacion(app);
       }
     });
   }

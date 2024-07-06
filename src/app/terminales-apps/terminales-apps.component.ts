@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { AplicacionService } from '../services/aplicacion.service';
 import { Aplicacion } from '../modelo/Aplicacion';
 
@@ -13,13 +13,20 @@ export class TerminalesAppsComponent {
 
   appElegida: Aplicacion | null = null;
 
-  constructor(private aplicacionService: AplicacionService){}
+  constructor(
+    private aplicacionService: AplicacionService
+  ){}
 
   ngOnInit(){
-    this.aplicacionService.aplicacionesSubject.asObservable().subscribe(aplicaciones => {
+    this.aplicacionService.aplicacionesSubject.subscribe(aplicaciones => {
       this.apps = aplicaciones;
-      if(aplicaciones.length > 0){
-        this.appElegida = aplicaciones[0];
+      if(this.appElegida && this.apps.find(app => app.getPuerto() == this.appElegida!.getPuerto())){
+        this.appElegida = this.apps.find(app => app.getPuerto() == this.appElegida!.getPuerto())!;
+      }
+      else {
+        this.appElegida = this.apps.length > 0
+          ? this.apps[0]
+          : null;
       }
     })
   }
