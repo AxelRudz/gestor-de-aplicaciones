@@ -15,7 +15,7 @@ export class ModalAgregarAppComponent {
   @ViewChild("btnCerrar") btnCerrar!: ElementRef;
 
   formularioAgregarAplicacion = this.fb.group({
-    tipo: ["angular", [Validators.required]],
+    tipo: ["Angular", [Validators.required]],
     nombre: ["", [Validators.required]],
     puerto: ["", [Validators.required]],
     ruta: ["", [Validators.required]],
@@ -52,11 +52,12 @@ export class ModalAgregarAppComponent {
       const ruta = f.get('ruta')!.value!;
 
       if(!this.aplicacionService.aplicaciones.some(app => app.getNombre() == nombre)){
-        tipo == "angular"
+        tipo == "Angular"
         ? this.aplicacionService.agregarAplicacion(new AngularApp(nombre, Number.parseInt(puerto), ruta)) 
         : this.aplicacionService.agregarAplicacion(new SpringApp(nombre, Number.parseInt(puerto), ruta));        
-        this.formularioAgregarAplicacion.reset();
-        this.renderer.selectRootElement(this.btnCerrar.nativeElement).click(); 
+        this.formularioAgregarAplicacion.reset({tipo: 'Angular'});
+        this.formularioAgregarAplicacion.updateValueAndValidity();
+        this.renderer.selectRootElement(this.btnCerrar.nativeElement, true).click(); 
       }      
     }
     else {

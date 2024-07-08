@@ -5,7 +5,9 @@
       <th>Puerto</th>
       <th>Rama actual</th>
       <th>Estado</th>
-      <th></th>      
+      <th></th>    
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -50,10 +52,25 @@
         </button>
         <button
           *ngIf="!app.estaEnEjecucion()"
-          class="btn btn-primary"
+          class="btn btn-primary me-1"
           (click)="iniciarApp(app)">
           <i class="fa-solid fa-play me-2"></i>
           Iniciar
+        </button>
+      </td>
+      <td>
+        <button
+          *ngIf="!app.estaEnEjecucion()"
+          class="btn btn-primary ms-1"
+          (click)="iniciarYAbrirApp(app)">
+          <i class="fa-solid fa-play me-2"></i>
+          Iniciar y abrir
+        </button>
+      </td>
+      <td>
+        <button class="btn btn-danger" (click)="eliminarApp(app)">
+          <i class="fa-solid fa-trash me-2"></i>
+          Eliminar
         </button>
       </td>
     </tr>

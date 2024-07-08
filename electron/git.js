@@ -2,26 +2,25 @@ const { ipcMain } = require('electron');
 const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { rejects } = require('assert');
 
-ipcMain.on('obtener-rama-git', async (event, {puerto, ruta}) => {
+ipcMain.on('observar-rama-git', async (event, {puerto, ruta}) => {
   
   // Devuelvo el nombre de la rama actual...y luego empiezo a escuchar cambios en el archivo
   const headFilePath = path.join(ruta, '.git', 'HEAD');
-  devolverNombreRamaGit(ruta, puerto, event);
+  sendRamaNombreGit(ruta, puerto, event);
   fs.watchFile(headFilePath, (curr, prev) => {
     // Al detectar un cambio en el archivo HEAD
-    devolverNombreRamaGit(ruta, puerto, event);
+    sendRamaNombreGit(ruta, puerto, event);
   });
 });
 
-function devolverNombreRamaGit(rutaApp, puerto, event){
+function sendRamaNombreGit(rutaApp, puerto, event){
   exec('git branch --show-current', { cwd: rutaApp }, (error, stdout, stderr) => {
-    let branchName = null
+    let branchName = "No disponible"
     if (!error) {
       branchName = stdout.trim();
     }
-    event.sender.send(`respuesta-rama-git-${puerto}`, {ruta: rutaApp, nombre: branchName});
+    event.sender.send(`respuesta-observar-rama-git-${puerto}`, {ruta: rutaApp, nombre: branchName});
   });
 }
 
@@ -29,18 +28,45 @@ ipcMain.handle('obtener-info-ramas-git', async (event, body) => {
   const rutaRepo = body[0].rutaRepo;
   const puerto = body[0].puerto;
   return new Promise((resolve, reject) => {
-    exec(`cd ${rutaRepo} && git fetch && git branch -r && git status -uno`, (error, stdout, stderr) => {
+    exec(`cd ${rutaRepo} && git fetch && git branch --all`, (error, stdout, stderr) => {
       if (error || stderr) {
         resolve(null);
       }
   
       // Procesar la salida de los comandos
       const lineasSalida = stdout.split('\n');
-      const ramas = lineasSalida.filter(linea => linea.startsWith('  origin/')).map(linea => linea.trim());
+      const ramas = lineasSalida
+        .map(linea => linea.trim())
+        .map(linea => {
+          const ArregloCaracteres = linea.split("");
+          let nombreRama = "";
+          ArregloCaracteres.forEach(caracter => {
+            caracter != "*" && caracter != " "
+              ? nombreRama += caracter
+              : nombreRama += "";
+          })
+          if(!nombreRama.includes("HEAD->")){
+            return nombreRama;
+          }
+          return "";          
+        })
+        .filter(nombre => nombre != "")
+        .map(nombreRama => {
+          if(nombreRama.includes("remotes/origin/")){
+            return nombreRama.split("remotes/origin/")[1]
+          }
+          return nombreRama;
+        })
+      let ramasFiltradas = [];
+      ramas.forEach(rama => {
+        if(!ramasFiltradas.includes(rama)){
+          ramasFiltradas.push(rama);
+        }
+      })
       const tieneCambios = lineasSalida.some(line => line.includes('Your branch is behind'));
   
       const response = {
-        ramas,
+        ramas: ramasFiltradas,
         tieneCambios
       };
       console.log(`Envio a respuesta-obtener-info-ramas-git-${puerto}`, response);

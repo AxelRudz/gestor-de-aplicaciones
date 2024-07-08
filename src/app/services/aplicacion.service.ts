@@ -65,8 +65,8 @@ export class AplicacionService {
   escucharCambiosNombreRama(app: Aplicacion){    
     const puerto = app.getPuerto();
     const ruta = app.getRuta();
-    this.electronService.send('obtener-rama-git', {puerto, ruta});
-    this.electronService.on(`respuesta-rama-git-${puerto}`, (event: any, response: {ruta: string, nombre: string}) => {
+    this.electronService.send('observar-rama-git', {puerto, ruta});
+    this.electronService.on(`respuesta-observar-rama-git-${puerto}`, (event: any, response: {ruta: string, nombre: string}) => {
       app.setNombreRamaGit(response.nombre);
       this.aplicacionesSubject.next(this.aplicaciones);
     });
@@ -75,8 +75,25 @@ export class AplicacionService {
   iniciarApp(app: Aplicacion){
     const ruta = app.getRuta();
     const puerto = app.getPuerto();
+    const abrir = false;
 
-    this.electronService.send("iniciar-app-angular", {ruta, puerto})
+    this.electronService.send("iniciar-app-angular", {ruta, puerto, abrir})
+    this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, mensajeTerminal: string) => {  
+      const appGuardada = this.aplicaciones.find(appGuadada => appGuadada.getPuerto() == app.getPuerto())
+      if(appGuardada){
+        appGuardada.setEnEjecucion(true);
+        appGuardada.agregarMensajeTerminal(mensajeTerminal);
+        this.aplicacionesSubject.next(this.aplicaciones);
+      }
+    });
+  }
+
+  iniciarYAbrirApp(app: Aplicacion){
+    const ruta = app.getRuta();
+    const puerto = app.getPuerto();
+    const abrir = true;
+
+    this.electronService.send("iniciar-app-angular", {ruta, puerto, abrir})
     this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, mensajeTerminal: string) => {  
       const appGuardada = this.aplicaciones.find(appGuadada => appGuadada.getPuerto() == app.getPuerto())
       if(appGuardada){
@@ -100,6 +117,17 @@ export class AplicacionService {
       }
     });
   }  
+
+  eliminarApp(app: Aplicacion){
+    const puerto = app.getPuerto();
+    this.electronService.invoke('eliminar-app', puerto)
+    .then(ok => {
+      if(ok){
+        this.aplicaciones = this.aplicaciones.filter(appAgregada => appAgregada.getPuerto() != app.getPuerto());
+        this.aplicacionesSubject.next(this.aplicaciones);
+      }
+    })    
+  }
 
 
 }

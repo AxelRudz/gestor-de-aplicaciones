@@ -5,9 +5,9 @@ const { matarApp } = require('./AppsDefecto');
 // {puerto, proceso}[]
 let aplicacionesCorriendo = [];
 
-ipcMain.on('iniciar-app-angular', async (event, {ruta, puerto}) => {
+ipcMain.on('iniciar-app-angular', async (event, {ruta, puerto, abrir}) => {  
   
-  const comando = `cd ${ruta} && ng serve --port ${puerto}`;
+  const comando = `cd ${ruta} && ng serve ${abrir ? '-o':''} --port ${puerto}`;
 
   if(!aplicacionesCorriendo.some(appYaCorriendo => appYaCorriendo.puerto == puerto)){
     const child = spawn(comando, {
@@ -38,6 +38,19 @@ ipcMain.on('detener-app-angular', async (event, puerto) => {
       }
     })    
   }
+});
+
+ipcMain.handle('eliminar-app', async (event, puerto) => {
+  return new Promise((resolve, reject) => {
+    const app = aplicacionesCorriendo.find(app => app.puerto == puerto);
+    if(app){
+      matarApp(app.proceso.pid)
+      .then(ok => {
+        resolve(ok);
+      })
+    }
+    resolve(true);
+  });
 });
 
 const matarAppsAngular = () => {

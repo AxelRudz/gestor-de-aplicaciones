@@ -31,12 +31,16 @@ export class TablaAplicacionesComponent {
   ngOnDestroy(): void {    
     this.suscripcion.unsubscribe();
     this.aplicaciones.forEach(app => {
-      this.electronService.removeAllListeners(`respuesta-rama-git-${app.getPuerto()}`)
+      this.electronService.removeAllListeners(`respuesta-observar-rama-git-${app.getPuerto()}`)
     });
   }  
 
   iniciarApp(app: Aplicacion){
     this.aplicacionService.iniciarApp(app);
+  }
+
+  iniciarYAbrirApp(app: Aplicacion){
+    this.aplicacionService.iniciarYAbrirApp(app);
   }
 
   detenerApp(app: Aplicacion){
@@ -52,6 +56,10 @@ export class TablaAplicacionesComponent {
 
   cambiarDeRama(app: Aplicacion, rama: string){
     this.aplicacionService.cambiarDeRama(app, rama);
+  }
+
+  eliminarApp(app: Aplicacion){
+    this.aplicacionService.eliminarApp(app);
   }
 
 
