@@ -7,14 +7,13 @@
       <th>Estado</th>
       <th></th>    
       <th></th>
-      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let app of aplicaciones">
       <td>
         <div class="d-flex justify-content-center align-items-center">
-          <img class="me-2" src="{{app.getUrlLogo()}}" alt="logo-app" style="width: 20px; height: 20px;">
+          <img class="me-2" src="{{app.getLogoUrl()}}" alt="logo-app" style="width: 20px; height: 20px;">
           <span>{{app.getNombre()}}</span>
         </div>
       </td>
@@ -22,16 +21,16 @@
       <td>
         <button *ngIf="!hayMuchasRamas(app)" class="btn btn-outline-dark">
           <i class="fa-solid fa-code-branch me-2"></i>
-          {{app.getRamaGit()}}
+          {{app.getGit().getRamaActual()}}
         </button>
         <div *ngIf="hayMuchasRamas(app)" class="dropdown">
           <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-code-branch me-2"></i>
-            {{app.getRamaGit()}}
+            {{app.getGit().getRamaActual()}}
           </button>
           <ul class="dropdown-menu dropdown-menu">
-            <ng-container *ngFor="let rama of app.getInfoRamas()!.ramas; let i = index">
-              <li *ngIf="!rama.includes('origin/HEAD')" (click)="cambiarDeRama(app, rama)">
+            <ng-container *ngFor="let rama of app.getGit().getRamasDisponibles(); let i = index">
+              <li (click)="app.getGit().gitCheckout(rama)">
                 <a class="dropdown-item" href="#">
                   <i class="fa-solid fa-code-branch me-2"></i>
                   {{rama}}
@@ -41,34 +40,25 @@
           </ul>
         </div>
       </td>
-      <td>{{app.estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
+      <td>{{app.getEstado().estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
       <td>
         <button
-          *ngIf="app.estaEnEjecucion()"
-          class="btn btn-danger"
-          (click)="detenerApp(app)">
+          *ngIf="app.getEstado().estaEnEjecucion()"
+          (click)="app.detener()"
+          class="btn btn-danger">
           <i class="fa-solid fa-stop me-2"></i>
           Detener
         </button>
         <button
-          *ngIf="!app.estaEnEjecucion()"
+          *ngIf="!app.getEstado().estaEnEjecucion()"
           class="btn btn-primary me-1"
-          (click)="iniciarApp(app)">
+          (click)="app.iniciar()">
           <i class="fa-solid fa-play me-2"></i>
           Iniciar
         </button>
       </td>
       <td>
-        <button
-          *ngIf="!app.estaEnEjecucion()"
-          class="btn btn-primary ms-1"
-          (click)="iniciarYAbrirApp(app)">
-          <i class="fa-solid fa-play me-2"></i>
-          Iniciar y abrir
-        </button>
-      </td>
-      <td>
-        <button class="btn btn-danger" (click)="eliminarApp(app)">
+        <button class="btn btn-danger" (click)="app.eliminar()">
           <i class="fa-solid fa-trash me-2"></i>
           Eliminar
         </button>

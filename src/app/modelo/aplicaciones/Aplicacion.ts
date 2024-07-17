@@ -1,0 +1,80 @@
+import { Estado } from "./Estado";
+import { Git } from "./Git";
+import { Terminal } from "./Terminal";
+import { ElectronService } from "src/app/services/electron.service";
+import { NgZone } from "@angular/core";
+import { AplicacionService } from "src/app/services/aplicacion.service";
+
+export abstract class Aplicacion {
+
+  private nombre: string;
+  private puerto: number;
+  private ruta: string;
+  private git: Git;
+  private estado: Estado;
+  private terminal: Terminal;
+  protected electronService: ElectronService;  
+  protected aplicacionService: AplicacionService;
+  protected ngZone: NgZone;
+
+  constructor(
+    nombre: string,
+    puerto: number,
+    ruta: string,
+    electronService: ElectronService,
+    aplicacionService: AplicacionService,
+    ngZone: NgZone
+  ){
+    this.nombre = nombre;
+    this.puerto = puerto;
+    this.ruta = ruta;
+    this.git = new Git();
+    this.estado = new Estado();
+    this.terminal = new Terminal();    
+    this.electronService = electronService;
+    this.aplicacionService = aplicacionService;
+    this.ngZone = ngZone;
+  }
+
+  abstract getLogoUrl(): string;
+  abstract iniciar(): void;
+  abstract detener(): void;
+  abstract eliminar(): void;
+
+  getNombre(): string {
+    return this.nombre;
+  }
+
+  setNombre(nombre: string): void {
+    this.nombre = nombre;
+  }
+
+  getPuerto(): number {
+    return this.puerto;
+  }
+
+  setPuerto(puerto: number): void {
+    this.puerto = puerto;
+  }
+
+  getRuta(): string {
+    return this.ruta;
+  }
+
+  setRuta(ruta: string): void {
+    this.ruta = ruta;
+  }
+
+  getGit(): Git{
+    return this.git;
+  }
+
+  getEstado(): Estado {
+    return this.estado;
+  }
+
+  getTerminal(): Terminal {
+    return this.terminal;
+  }
+
+}

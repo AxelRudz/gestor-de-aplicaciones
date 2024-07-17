@@ -1,6 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { AplicacionService } from './services/aplicacion.service';
-import { Aplicacion } from './modelo/Aplicacion';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -9,23 +7,4 @@ import { Aplicacion } from './modelo/Aplicacion';
 })
 export class AppComponent {
   title = 'gestor-de-aplicaciones';
-
-  apps: Aplicacion[] = [];
-
-  timer = setInterval(() => {
-    this.aplicacionService.ejecutarTareasPeriodicas();
-  }, 3000);
-
-  constructor(
-    private aplicacionService: AplicacionService,
-    private cdr: ChangeDetectorRef,
-  ){}
-
-  ngOnInit(){
-    this.aplicacionService.aplicacionesSubject.asObservable().subscribe(aplicaciones => {
-      this.apps = aplicaciones;
-    })
-  }
-
-
 }

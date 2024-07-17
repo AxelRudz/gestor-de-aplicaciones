@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, NgZone, Renderer2, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ElectronService } from '../services/electron.service';
 import { AplicacionService } from '../services/aplicacion.service';
-import { AngularApp } from '../modelo/AngularApp';
-import { SpringApp } from '../modelo/SpringApp';
+import { Angular } from '../modelo/aplicaciones/Angular';
+import { SpringBoot } from '../modelo/aplicaciones/SpringBoot';
 
 @Component({
   selector: 'app-modal-agregar-app',
@@ -27,6 +27,7 @@ export class ModalAgregarAppComponent {
     private fb: FormBuilder,
     private cdRef: ChangeDetectorRef,
     private renderer: Renderer2,
+    private ngZone: NgZone
   ){}
 
   ngOnDestroy(): void {
@@ -51,14 +52,14 @@ export class ModalAgregarAppComponent {
       const puerto = f.get('puerto')!.value!;
       const ruta = f.get('ruta')!.value!;
 
-      if(!this.aplicacionService.aplicaciones.some(app => app.getNombre() == nombre)){
-        tipo == "Angular"
-        ? this.aplicacionService.agregarAplicacion(new AngularApp(nombre, Number.parseInt(puerto), ruta)) 
-        : this.aplicacionService.agregarAplicacion(new SpringApp(nombre, Number.parseInt(puerto), ruta));        
-        this.formularioAgregarAplicacion.reset({tipo: 'Angular'});
-        this.formularioAgregarAplicacion.updateValueAndValidity();
-        this.renderer.selectRootElement(this.btnCerrar.nativeElement, true).click(); 
-      }      
+      const app = tipo == "Angular"
+        ? new Angular(nombre, Number.parseInt(puerto), ruta, this.electronService, this.aplicacionService,this.ngZone)
+        : new SpringBoot(nombre, Number.parseInt(puerto), ruta, this.electronService, this.aplicacionService, this.ngZone)
+      
+      if(this.aplicacionService.agregarAplicacion(app)){
+        this.formularioAgregarAplicacion.reset({tipo: "Angular"})
+        this.renderer.selectRootElement(this.btnCerrar.nativeElement, true).click();
+      }
     }
     else {
       alert("Formulario inválido.");

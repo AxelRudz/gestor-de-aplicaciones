@@ -1,110 +1,27 @@
-import { ChangeDetectorRef, Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { Aplicacion } from '../modelo/Aplicacion';
-import { ElectronService } from './electron.service';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AplicacionService {
+export class AplicacionService {  
 
-  aplicaciones: Aplicacion[] = [];
-  aplicacionesSubject: BehaviorSubject<Aplicacion[]> = new BehaviorSubject<Aplicacion[]>(this.aplicaciones);
+  private aplicaciones: Aplicacion[] = [];
+  private aplicacionesSubject: BehaviorSubject<Aplicacion[]> = new BehaviorSubject<Aplicacion[]>(this.aplicaciones);
+  public aplicaciones$: Observable<Aplicacion[]> = this.aplicacionesSubject.asObservable();  
 
-  constructor(private electronService: ElectronService){}
-
-  ejecutarTareasPeriodicas(){
-    this.aplicaciones.forEach(app => this.recuperarDatosRamas(app));
-  }
-
-  recuperarDatosRamas(app: Aplicacion){
-    const rutaRepo = app.getRuta();
-    const puerto = app.getPuerto();
-    const body = {
-      rutaRepo,
-      puerto
+  agregarAplicacion(app: Aplicacion): boolean {
+    if(this.aplicaciones.some(appAgregada => appAgregada.getPuerto() == app.getPuerto())){
+      return false;
     }
-    this.electronService.invoke('obtener-info-ramas-git', body)
-    .then(response => {
-      app.setInfoRamas(response)
-      this.aplicacionesSubject.next(this.aplicaciones);
-    })
+    this.aplicaciones.push(app);
+    this.aplicacionesSubject.next(this.aplicaciones);
+    return true;
   }
 
-  cambiarDeRama(app: Aplicacion, unaRama: string){
-    const rutaRepo = app.getRuta();
-    let rama = unaRama;
-    if(rama.split("/")[0] == "origin"){
-      rama = rama.substring(7)
-    }
-    const body = {
-      rutaRepo,
-      rama
-    }
-    this.electronService.invoke('cambiar-de-rama', body)
-    .then(ok => {
-      if(ok){
-        app.setNombreRamaGit(rama);
-        this.aplicacionesSubject.next(this.aplicaciones);
-      }
-    })
-  }
-
-  agregarAplicacion(appNueva: Aplicacion){
-    const existeUnaAppConElMismoPuerto = this.aplicaciones.some(app => {
-      app.getPuerto() == appNueva.getPuerto()
-    })
-
-    if(!existeUnaAppConElMismoPuerto){
-      this.aplicaciones.push(appNueva);
-      this.escucharCambiosNombreRama(appNueva);
-      this.aplicacionesSubject.next(this.aplicaciones);
-    }
-  }
-
-  escucharCambiosNombreRama(app: Aplicacion){    
-    const puerto = app.getPuerto();
-    const ruta = app.getRuta();
-    this.electronService.send('observar-rama-git', {puerto, ruta});
-    this.electronService.on(`respuesta-observar-rama-git-${puerto}`, (event: any, response: {ruta: string, nombre: string}) => {
-      app.setNombreRamaGit(response.nombre);
-      this.aplicacionesSubject.next(this.aplicaciones);
-    });
-  }
-
-  iniciarApp(app: Aplicacion){
-    const ruta = app.getRuta();
-    const puerto = app.getPuerto();
-    const abrir = false;
-
-    this.electronService.send("iniciar-app-angular", {ruta, puerto, abrir})
-    this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, mensajeTerminal: string) => {  
-      const appGuardada = this.aplicaciones.find(appGuadada => appGuadada.getPuerto() == app.getPuerto())
-      if(appGuardada){
-        appGuardada.setEnEjecucion(true);
-        appGuardada.agregarMensajeTerminal(mensajeTerminal);
-        this.aplicacionesSubject.next(this.aplicaciones);
-      }
-    });
-  }
-
-  iniciarYAbrirApp(app: Aplicacion){
-    const ruta = app.getRuta();
-    const puerto = app.getPuerto();
-    const abrir = true;
-
-    this.electronService.send("iniciar-app-angular", {ruta, puerto, abrir})
-    this.electronService.on(`respuesta-inicio-app-angular-${puerto}`, (event: any, mensajeTerminal: string) => {  
-      const appGuardada = this.aplicaciones.find(appGuadada => appGuadada.getPuerto() == app.getPuerto())
-      if(appGuardada){
-        appGuardada.setEnEjecucion(true);
-        appGuardada.agregarMensajeTerminal(mensajeTerminal);
-        this.aplicacionesSubject.next(this.aplicaciones);
-      }
-    });
-  }
-
-  detenerApp(app: Aplicacion){
+  
+  /*detenerApp(app: Aplicacion){
     this.electronService.send("detener-app-angular", app.getPuerto());
     this.electronService.once(`respuesta-detener-app-angular-${app.getPuerto()}`, (event: any, ok: boolean) => {
       if(ok){
@@ -116,17 +33,11 @@ export class AplicacionService {
         }
       }
     });
-  }  
+  }  */
 
-  eliminarApp(app: Aplicacion){
-    const puerto = app.getPuerto();
-    this.electronService.invoke('eliminar-app', puerto)
-    .then(ok => {
-      if(ok){
-        this.aplicaciones = this.aplicaciones.filter(appAgregada => appAgregada.getPuerto() != app.getPuerto());
-        this.aplicacionesSubject.next(this.aplicaciones);
-      }
-    })    
+  eliminarApp(puerto: number){
+    this.aplicaciones = this.aplicaciones.filter(appAgregada => appAgregada.getPuerto() != puerto);
+    this.aplicacionesSubject.next(this.aplicaciones);
   }
 
 

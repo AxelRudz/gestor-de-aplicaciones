@@ -17,35 +17,23 @@ ipcMain.on('iniciar-app-angular', async (event, {ruta, puerto, abrir}) => {
     child.stdout.on('data', (data) => {
       // Enviar datos a Angular (a través de IPC o como prefieras)
       console.log(`stdout: ${data}`);
-      event.sender.send(`respuesta-inicio-app-angular-${puerto}`, data.toString());
+      event.sender.send(`iniciar-app-angular-${puerto}`, data.toString());
     });
   
     child.stderr.on('data', (error) => {
       console.error(`stderr: ${error}`);
-      event.sender.send(`respuesta-inicio-app-angular-${puerto}`, error.toString());
+      event.sender.send(`iniciar-app-angular-${puerto}`, error.toString());
     });
   }
 });
 
-ipcMain.on('detener-app-angular', async (event, puerto) => {
-  const appParaDetener = aplicacionesCorriendo.find(appYaCorriendo => appYaCorriendo.puerto == puerto)
-  if(appParaDetener){
-    matarApp(appParaDetener.proceso.pid)
-    .then(ok => {
-      if(ok){
-        event.sender.send(`respuesta-detener-app-angular-${puerto}`, ok);
-        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo != appParaDetener);
-      }
-    })    
-  }
-});
-
-ipcMain.handle('eliminar-app', async (event, puerto) => {
+ipcMain.handle('detener-app-angular', async (event, puerto) => {
   return new Promise((resolve, reject) => {
     const app = aplicacionesCorriendo.find(app => app.puerto == puerto);
     if(app){
       matarApp(app.proceso.pid)
       .then(ok => {
+        aplicacionesCorriendo = aplicacionesCorriendo.filter(aplicacionCorriendo => aplicacionCorriendo != app);
         resolve(ok);
       })
     }
@@ -53,17 +41,17 @@ ipcMain.handle('eliminar-app', async (event, puerto) => {
   });
 });
 
-const matarAppsAngular = () => {
+const matarTodasLasAppsAngular = () => {
   aplicacionesCorriendo.forEach(app => {
     matarApp(app.proceso.pid)
     .then(ok => {
       if(ok){
-        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo != appParaDetener);
+        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo != app);
       }
     })
   })
 }
 
 module.exports = {
-  matarAppsAngular
+  matarTodasLasAppsAngular
 }

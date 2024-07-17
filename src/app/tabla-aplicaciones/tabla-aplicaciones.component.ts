@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { Aplicacion } from '../modelo/Aplicacion';
+import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
 import { Subscription } from 'rxjs';
 import { AplicacionService } from '../services/aplicacion.service';
-import { ElectronService } from '../services/electron.service';
+import { Angular } from '../modelo/aplicaciones/Angular';
 
 @Component({
   selector: 'app-tabla-aplicaciones',
@@ -17,49 +17,24 @@ export class TablaAplicacionesComponent {
 
   timerEstadoApp: any;
 
-  constructor(
-    private aplicacionService: AplicacionService,
-    private electronService: ElectronService
-  ){}  
+  constructor(private aplicacionService: AplicacionService){}  
 
   ngOnInit(){
-    this.suscripcion = this.aplicacionService.aplicacionesSubject.subscribe(aplicaciones => {
+    this.suscripcion = this.aplicacionService.aplicaciones$.subscribe(aplicaciones => {
       this.aplicaciones = aplicaciones;
     })
   }
 
   ngOnDestroy(): void {    
     this.suscripcion.unsubscribe();
-    this.aplicaciones.forEach(app => {
-      this.electronService.removeAllListeners(`respuesta-observar-rama-git-${app.getPuerto()}`)
-    });
   }  
 
-  iniciarApp(app: Aplicacion){
-    this.aplicacionService.iniciarApp(app);
-  }
-
-  iniciarYAbrirApp(app: Aplicacion){
-    this.aplicacionService.iniciarYAbrirApp(app);
-  }
-
-  detenerApp(app: Aplicacion){
-    this.aplicacionService.detenerApp(app);
-  }
-
   hayMuchasRamas(app: Aplicacion): boolean {
-    if(app.getInfoRamas()){
-      return app.getInfoRamas()!.ramas.length > 1;
-    }
-    return false;
+    return app.getGit().getRamasDisponibles().length > 1;
   }
 
-  cambiarDeRama(app: Aplicacion, rama: string){
-    this.aplicacionService.cambiarDeRama(app, rama);
-  }
-
-  eliminarApp(app: Aplicacion){
-    this.aplicacionService.eliminarApp(app);
+  esUnaAppAngular(app: Aplicacion): boolean {
+    return app instanceof(Angular);
   }
 
 
