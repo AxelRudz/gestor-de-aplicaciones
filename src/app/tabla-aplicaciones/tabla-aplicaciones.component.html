@@ -1,18 +1,19 @@
-<table class="table table-stripped">
-  <thead>
+<table *ngIf="aplicaciones.length > 0" class="table table-stripped tabla-custom">
+  <thead class="table-dark" style="border-color: var(--bs-dark);">
     <tr class="text-center">
-      <th>Aplicación</th>
+      <th style="border-radius: 10px 0 0 0;">Aplicación</th>
       <th>Puerto</th>
       <th>Rama actual</th>
       <th></th>
       <th>Estado</th>
       <th></th>    
-      <th></th>
+      <th style="border-radius: 0 10px 0 0;"></th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let app of aplicaciones">
-      <td>
+    <tr *ngFor="let app of aplicaciones; let i = index">
+      <!-- Uso el index solo con fines decorativos -->
+      <td [ngStyle]="{'border-radius': aplicaciones.length-1 == i?'0 0 0 10px':''}">
         <div class="d-flex justify-content-center align-items-center">
           <img class="me-2" src="{{app.getLogoUrl()}}" alt="logo-app" style="width: 20px; height: 20px;">
           <span>{{app.getNombre()}}</span>
@@ -20,12 +21,12 @@
       </td>
       <td>{{app.getPuerto()}}</td>
       <td>
-        <button *ngIf="!hayMuchasRamas(app)" class="btn btn-outline-dark">
+        <button *ngIf="!hayMuchasRamas(app)" class="btn btn-light">
           <i class="fa-solid fa-code-branch me-2"></i>
           {{app.getGit().getRamaActual()}}
         </button>
         <div *ngIf="hayMuchasRamas(app)" class="dropdown">
-          <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-code-branch me-2"></i>
             {{app.getGit().getRamaActual()}}
           </button>
@@ -42,7 +43,7 @@
         </div>
       </td>
       <td>
-        <div *ngIf="app.getGit().getRamaDesactualizada()" class="alert alert-warning p-2" role="alert" style="width: fit-content;">
+        <div *ngIf="app.getGit().getRamaDesactualizada()" class="alert alert-warning p-2" role="alert" style="width: fit-content; margin: 0 auto">
           <i class="fa-solid fa-triangle-exclamation"></i>
           Tu rama local está desactualizada.
           <div (click)="app.getGit().gitPull()" class="git-pull-link">
@@ -67,7 +68,7 @@
           Iniciar
         </button>
       </td>
-      <td>
+      <td [ngStyle]="{'border-radius': aplicaciones.length-1 == i?'0 0 10px 0':''}">
         <button class="btn btn-danger" (click)="app.eliminar()">
           <i class="fa-solid fa-trash me-2"></i>
           Eliminar

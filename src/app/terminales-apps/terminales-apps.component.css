@@ -2,7 +2,7 @@
   width: fit-content;
   height: fit-content;
   padding: 5px 15px;
-  background-color: rgb(100, 100, 100);
+  background-color: var(--bs-dark);
   margin: 5px;
   border-radius: 20px;
   text-align: center;
@@ -12,10 +12,28 @@
 }
 
 .btn-terminal:hover {
-  background-color: rgb(80, 80, 80);
+  background-color: rgb(50, 50, 50);
+}
+
+.btn-terminal-elegida {
+  background-color: var(--bs-primary);
+}
+
+.btn-limpiar-terminal {
+  width: fit-content;
+  cursor: pointer;
+  color: rgb(220,220,220) !important;
+}
+
+.btn-limpiar-terminal:hover {
+  color: rgb(255,255,255) !important;
 }
 
 .terminal {
-  margin-top: 20px;
+  margin-top: 0px;
   min-height: 200px;
+  color: white;
+  background-color: rgba(0,0,0,0.4);
+  max-height: 400px;
+  overflow-y: auto;
 }

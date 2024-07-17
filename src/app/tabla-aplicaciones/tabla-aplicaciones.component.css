@@ -18,3 +18,10 @@ th, td {
 .git-pull-link:hover {
   text-decoration: underline;
 }
+
+.tabla-custom td {
+  color: white;
+  background-color: rgba(0,0,0,0.4);
+  border: none;
+  vertical-align: middle;
+}

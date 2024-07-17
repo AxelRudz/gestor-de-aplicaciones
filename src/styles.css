@@ -7,4 +7,6 @@
 
 html, body {
   /*background-color: var(--bs-dark);*/
+  background: url("assets/background.jpg") fixed no-repeat;
+  background-size: cover;
 }

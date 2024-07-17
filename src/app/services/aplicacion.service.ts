@@ -1,15 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
+import { Angular } from '../modelo/aplicaciones/Angular';
+import { ElectronService } from './electron.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AplicacionService {  
 
-  private aplicaciones: Aplicacion[] = [];
+  private aplicaciones: Aplicacion[] = [
+    new Angular("App 1", 5000, "C:\\Proyectos\\prueba", this.electronService, this, this.ngZone)
+  ];
+
   private aplicacionesSubject: BehaviorSubject<Aplicacion[]> = new BehaviorSubject<Aplicacion[]>(this.aplicaciones);
   public aplicaciones$: Observable<Aplicacion[]> = this.aplicacionesSubject.asObservable();  
+
+  constructor(private electronService: ElectronService, private ngZone: NgZone){}
 
   agregarAplicacion(app: Aplicacion): boolean {
     if(this.aplicaciones.some(appAgregada => appAgregada.getPuerto() == app.getPuerto())){

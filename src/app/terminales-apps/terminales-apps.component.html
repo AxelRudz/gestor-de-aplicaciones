@@ -1,13 +1,23 @@
 <ng-container *ngIf="apps.length > 0">
-  <h2 class="mt-5 mb-3">Terminales apps</h2>
+  <h2 class="mt-5 mb-3 text-light" style="margin-top: 75px !important;">
+    Terminales
+  </h2>
 
   <div class="d-flex align-items-center">
-    <div *ngFor="let app of apps" (click)="appElegida = app" class="btn-terminal">
+    <div *ngFor="let app of apps" (click)="appElegida = app" class="btn-terminal" [class.btn-terminal-elegida]="appElegida == app">
       <img src="{{app.getLogoUrl()}}" alt="logo-app" style="width: 25px; height: 25px;">
       {{app.getNombre()}}
     </div>
   </div>
   
+  <div
+    *ngIf="appElegida"
+    class="mt-3 text-light btn-limpiar-terminal"
+    (click)="appElegida.getTerminal().setMensajes([])"
+  >
+    <i class="fa-solid fa-eraser mx-1 mb-3"></i>
+    Limpiar terminal
+  </div>
   <div *ngIf="appElegida" class="card card-body terminal">
     <p><span class="text-primary d-inline"><b>{{appElegida.getNombre()}}</b></span> {{appElegida.getRuta()}}</p>
     <p *ngFor="let mensaje of appElegida.getTerminal().getMensajes()">
