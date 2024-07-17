@@ -87,24 +87,36 @@ export class Git {
   }
 
   tareasPeriodicas = () => {
-    this.obtenerTodasLasRamasYSiEstaAlDia()
+    this.consultarRamas();
+    this.verificarSiLaRamaActualEstaDesactualizada();
   }
 
-  obtenerTodasLasRamasYSiEstaAlDia(): void {
-    const body = {
-      rutaRepo: this.rutaRepo,
-      puerto: this.puerto
-    }
-    this.electronService.invoke("obtener-info-ramas-git", body)
-      .then(
-        (response: {ramas: string[],tieneCambios: boolean} | null) => {
+  consultarRamas(): void {
+    const rutaRepo = this.rutaRepo;
+    this.electronService.invoke("consultar-ramas-git", rutaRepo)
+      .then((ramas: string[]) => {
         this.ngZone.run(() => {
-          if(response){
-            this.ramasDisponibles = response.ramas;
-            this.ramaDesactualizada = response.tieneCambios;
-          }
-          else {
-            this.ramasDisponibles = [];
+          this.ramasDisponibles = ramas;
+        })
+      });
+  }
+
+  verificarSiLaRamaActualEstaDesactualizada(): void {
+    const rutaRepo = this.rutaRepo;
+    this.electronService.invoke("consultar-rama-desactualizada", rutaRepo)
+      .then((estaDesactualizada: boolean) => {
+        this.ngZone.run(() => {
+          this.ramaDesactualizada = estaDesactualizada;
+        })
+      });
+  }
+
+  gitPull(): void {
+    const rutaRepo = this.rutaRepo;
+    this.electronService.invoke("git-pull", rutaRepo)
+      .then((ok: boolean) => {
+        this.ngZone.run(() => {
+          if(ok){
             this.ramaDesactualizada = false;
           }
         })

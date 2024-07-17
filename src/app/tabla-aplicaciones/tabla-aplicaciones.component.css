@@ -8,3 +8,13 @@ th, td {
   --bs-tooltip-bg: var(--bd-violet-bg);
   --bs-tooltip-color: var(--bs-white);
 }
+
+.git-pull-link {
+  display: inline-block;
+  color: var(--bs-primary);
+  cursor: pointer;
+}
+
+.git-pull-link:hover {
+  text-decoration: underline;
+}

@@ -4,6 +4,7 @@
       <th>Aplicación</th>
       <th>Puerto</th>
       <th>Rama actual</th>
+      <th></th>
       <th>Estado</th>
       <th></th>    
       <th></th>
@@ -38,6 +39,15 @@
               </li>
             </ng-container>
           </ul>
+        </div>
+      </td>
+      <td>
+        <div *ngIf="app.getGit().getRamaDesactualizada()" class="alert alert-warning p-2" role="alert" style="width: fit-content;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Tu rama local está desactualizada.
+          <div (click)="app.getGit().gitPull()" class="git-pull-link">
+            Git pull
+          </div>
         </div>
       </td>
       <td>{{app.getEstado().estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
