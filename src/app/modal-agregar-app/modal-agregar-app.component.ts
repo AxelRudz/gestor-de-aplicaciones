@@ -35,12 +35,12 @@ export class ModalAgregarAppComponent {
   }
 
   abrirDialogRuta() {
-    this.electronService.send('abrir-ventana-seleccion-directorio');
-    this.electronService.on("ruta", (event: any, ruta: string) => {
-      this.formularioAgregarAplicacion.get("ruta")?.setValue(ruta);
-      this.formularioAgregarAplicacion.updateValueAndValidity();
-      this.cdRef.detectChanges();
-    });
+    this.electronService.invoke('seleccionar-directorio')
+      .then((ruta: string | null) => {
+        this.formularioAgregarAplicacion.get("ruta")?.setValue(ruta);
+        this.formularioAgregarAplicacion.updateValueAndValidity();
+        this.cdRef.detectChanges();
+      })
   }
 
   agregarAplicacion(){

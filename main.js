@@ -53,17 +53,19 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.on('abrir-ventana-seleccion-directorio', async (event) => {
-  try {
-    const result = await dialog.showOpenDialog(win, {
-      properties: ['openDirectory'],
-    });
-
-    if (result.canceled === false) {
-      const filePath = result.filePaths[0];
-      event.sender.send('ruta', filePath);
+ipcMain.handle('seleccionar-directorio', async (event) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await dialog.showOpenDialog(win, {
+        properties: ['openDirectory'],
+      });
+  
+      if (result.canceled === false) {
+        const filePath = result.filePaths[0];
+        resolve(filePath)
+      }
+    } catch (err) {
+      resolve(null)
     }
-  } catch (err) {
-    console.error('Error opening dialog:', err);
-  }
+  });
 });
