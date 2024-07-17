@@ -26,13 +26,11 @@ export class Angular extends Aplicacion {
     this.getTerminal().setMensajes(["Deteniendo aplicación..."]);
     return this.electronService.invoke('detener-app-angular', puerto)
       .then(ok => {
-        this.ngZone.run(() => {
-          if(ok){
-            this.electronService.removeAllListeners(`iniciar-app-angular-${puerto}`)
-          }
-          this.getEstado().setEnEjecucion(!ok);
-          this.getTerminal().setMensajes(ok ? ["Aplicación detenida."] : ["Ocurrió un error deteniendo la app."]);
-        })
+        if(ok){
+          this.electronService.removeAllListeners(`iniciar-app-angular-${puerto}`)
+        }
+        this.getEstado().setEnEjecucion(!ok);
+        this.getTerminal().setMensajes(ok ? ["Aplicación detenida."] : ["Ocurrió un error deteniendo la app."]);
         return ok;
       })
   }

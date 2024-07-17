@@ -63,11 +63,9 @@ export class Git {
     }
     this.electronService.invoke("git-checkout", body)
       .then(ok => {
-        this.ngZone.run(() => {
-          if(ok){
-            this.ramaActual = rama;
-          }
-        });
+        if(ok){
+          this.ramaActual = rama;
+        }
       });
   };
 
@@ -95,9 +93,7 @@ export class Git {
     const rutaRepo = this.rutaRepo;
     this.electronService.invoke("consultar-ramas-git", rutaRepo)
       .then((ramas: string[]) => {
-        this.ngZone.run(() => {
-          this.ramasDisponibles = ramas;
-        })
+        this.ramasDisponibles = ramas;
       });
   }
 
@@ -105,9 +101,7 @@ export class Git {
     const rutaRepo = this.rutaRepo;
     this.electronService.invoke("consultar-rama-desactualizada", rutaRepo)
       .then((estaDesactualizada: boolean) => {
-        this.ngZone.run(() => {
-          this.ramaDesactualizada = estaDesactualizada;
-        })
+        this.ramaDesactualizada = estaDesactualizada;
       });
   }
 
@@ -115,11 +109,9 @@ export class Git {
     const rutaRepo = this.rutaRepo;
     this.electronService.invoke("git-pull", rutaRepo)
       .then((ok: boolean) => {
-        this.ngZone.run(() => {
-          if(ok){
-            this.ramaDesactualizada = false;
-          }
-        })
+        if(ok){
+          this.ramaDesactualizada = false;
+        }
       });
   }
 

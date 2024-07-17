@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { IpcRenderer} from "electron";
 
 @Injectable({
@@ -8,7 +8,7 @@ export class ElectronService {
 
   private ipc!: IpcRenderer;
 
-  constructor() {
+  constructor(private ngZone: NgZone) {
     if (window.require) {
       try {
         this.ipc = window.require("electron").ipcRenderer;
@@ -48,8 +48,18 @@ export class ElectronService {
     this.ipc.removeAllListeners(channel);
   }
 
-  public invoke(channel: string, ...args: any[]): Promise<any>{
-    return this.ipc.invoke(channel, args)
+  public invoke(channel: string, ...args: any[]): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.ipc.invoke(channel, args).then((result) => {
+        this.ngZone.run(() => {
+          resolve(result);
+        });
+      }).catch((error) => {
+        this.ngZone.run(() => {
+          reject(error);
+        });
+      });
+    });
   }
    
 }
