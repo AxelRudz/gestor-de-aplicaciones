@@ -3,9 +3,9 @@
     <tr class="text-center">
       <th style="border-radius: 10px 0 0 0;">Aplicación</th>
       <th>Puerto</th>
+      <th>Estado</th>
       <th>Rama actual</th>
       <th></th>
-      <th>Estado</th>
       <th></th>    
       <th style="border-radius: 0 10px 0 0;"></th>
     </tr>
@@ -20,6 +20,7 @@
         </div>
       </td>
       <td>{{app.getPuerto()}}</td>
+      <td>{{app.getEstado().estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
       <td>
         <button *ngIf="!hayMuchasRamas(app)" class="btn btn-light">
           <i class="fa-solid fa-code-branch me-2"></i>
@@ -51,7 +52,6 @@
           </div>
         </div>
       </td>
-      <td>{{app.getEstado().estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
       <td>
         <button
           *ngIf="app.getEstado().estaEnEjecucion()"

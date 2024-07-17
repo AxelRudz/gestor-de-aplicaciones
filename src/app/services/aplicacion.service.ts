@@ -10,7 +10,7 @@ import { ElectronService } from './electron.service';
 export class AplicacionService {  
 
   private aplicaciones: Aplicacion[] = [
-    new Angular("App 1", 5000, "C:\\Proyectos\\prueba", this.electronService, this, this.ngZone)
+    new Angular("Prueba", 5000, "C:\\Proyectos\\prueba", this.electronService, this, this.ngZone)
   ];
 
   private aplicacionesSubject: BehaviorSubject<Aplicacion[]> = new BehaviorSubject<Aplicacion[]>(this.aplicaciones);
