@@ -69,14 +69,13 @@ ipcMain.handle('obtener-info-ramas-git', async (event, body) => {
         ramas: ramasFiltradas,
         tieneCambios
       };
-      console.log(`Envio a respuesta-obtener-info-ramas-git-${puerto}`, response);
       resolve(response);
     });
   })
 });
 
 
-ipcMain.handle('cambiar-de-rama', async (event, body) => {
+ipcMain.handle('git-checkout', async (event, body) => {
   const rutaRepo = body[0].rutaRepo;
   const rama = body[0].rama;
   return new Promise((resolve, reject) => {

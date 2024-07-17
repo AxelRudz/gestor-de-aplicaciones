@@ -26,10 +26,10 @@ export class Angular extends Aplicacion {
     this.getTerminal().setMensajes(["Deteniendo aplicación..."]);
     return this.electronService.invoke('detener-app-angular', puerto)
       .then(ok => {
-        if(ok){
-          this.electronService.removeAllListeners(`iniciar-app-angular-${puerto}`)
-        }
         this.ngZone.run(() => {
+          if(ok){
+            this.electronService.removeAllListeners(`iniciar-app-angular-${puerto}`)
+          }
           this.getEstado().setEnEjecucion(!ok);
           this.getTerminal().setMensajes(ok ? ["Aplicación detenida."] : ["Ocurrió un error deteniendo la app."]);
         })
@@ -40,9 +40,12 @@ export class Angular extends Aplicacion {
   override eliminar(): void {
     this.detener()
     .then(ok => {
-      if(ok){
-        this.aplicacionService.eliminarAplicacion(this.getPuerto());
-      }
+      this.ngZone.run(() => {
+        if(ok){
+          this.aplicacionService.eliminarAplicacion(this.getPuerto());
+          this.getGit().removeListeners();
+        }
+      });
     })    
   }
   

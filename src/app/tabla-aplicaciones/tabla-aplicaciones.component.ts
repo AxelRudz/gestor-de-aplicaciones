@@ -15,8 +15,6 @@ export class TablaAplicacionesComponent {
 
   suscripcion!: Subscription;
 
-  timerEstadoApp: any;
-
   constructor(private aplicacionService: AplicacionService){}  
 
   ngOnInit(){
