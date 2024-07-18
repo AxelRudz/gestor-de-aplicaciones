@@ -35,6 +35,10 @@ export class TablaAplicacionesComponent {
     return app instanceof(Angular);
   }
 
+  estaEnEjecucion(app: Aplicacion): boolean {
+    return app.getEstado().estaEnEjecucion();
+  }
+
 
 
 }

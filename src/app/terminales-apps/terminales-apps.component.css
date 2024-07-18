@@ -12,7 +12,7 @@
 }
 
 .btn-terminal:hover {
-  background-color: rgb(50, 50, 50);
+  background-color: var(--bs-primary);
 }
 
 .btn-terminal-elegida {

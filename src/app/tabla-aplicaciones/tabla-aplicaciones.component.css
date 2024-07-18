@@ -25,3 +25,15 @@ th, td {
   border: none;
   vertical-align: middle;
 }
+
+.td-rama {
+  width: fit-content;
+  margin: 0 auto;
+  color: rgb(225,225,255);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.td-rama:hover {
+  color: white;
+}

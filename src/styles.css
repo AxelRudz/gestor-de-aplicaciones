@@ -6,7 +6,11 @@
 }
 
 html, body {
-  /*background-color: var(--bs-dark);*/
-  background: url("assets/background.jpg") fixed no-repeat;
+  /*
+    background-color: var(--bs-dark);
+    background: url("https://www.elementaryos-fr.org/wp-content/uploads/2013/09/wallpaper-2906553.jpg") fixed no-repeat;
+    background: url("assets/background.jpg") fixed no-repeat;
+  */
+  background: url("assets/background2.jpeg") fixed no-repeat;
   background-size: cover;
 }

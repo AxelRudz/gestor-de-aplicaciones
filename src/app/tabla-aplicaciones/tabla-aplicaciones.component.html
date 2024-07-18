@@ -22,15 +22,15 @@
       <td>{{app.getPuerto()}}</td>
       <td>{{app.getEstado().estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
       <td>
-        <button *ngIf="!hayMuchasRamas(app)" class="btn btn-light">
+        <div *ngIf="!hayMuchasRamas(app)" class="td-rama">
           <i class="fa-solid fa-code-branch me-2"></i>
           {{app.getGit().getRamaActual()}}
-        </button>
-        <div *ngIf="hayMuchasRamas(app)" class="dropdown">
-          <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        </div>
+        <div *ngIf="hayMuchasRamas(app)" class="dropdown td-rama">
+          <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-code-branch me-2"></i>
             {{app.getGit().getRamaActual()}}
-          </button>
+          </div>
           <ul class="dropdown-menu dropdown-menu">
             <ng-container *ngFor="let rama of app.getGit().getRamasDisponibles(); let i = index">
               <li (click)="app.getGit().gitCheckout(rama)">
@@ -53,24 +53,17 @@
         </div>
       </td>
       <td>
-        <button
-          *ngIf="app.getEstado().estaEnEjecucion()"
-          (click)="app.detener()"
-          class="btn btn-danger">
-          <i class="fa-solid fa-stop me-2"></i>
-          Detener
-        </button>
-        <button
-          *ngIf="!app.getEstado().estaEnEjecucion()"
-          class="btn btn-primary me-1"
-          (click)="app.iniciar()">
-          <i class="fa-solid fa-play me-2"></i>
-          Iniciar
+        <button class="btn"
+          [ngClass]="estaEnEjecucion(app) ? 'btn-danger':'btn-primary'"
+          (click)="estaEnEjecucion(app) ? app.detener() : app.iniciar()"
+        >
+          <i class="fa-solid me-2" [ngClass]="estaEnEjecucion(app) ? 'fa-stop':'fa-play'"></i>
+          {{estaEnEjecucion(app) ? 'Detener' : 'Iniciar'}}
         </button>
       </td>
       <td [ngStyle]="{'border-radius': aplicaciones.length-1 == i?'0 0 10px 0':''}">
-        <button class="btn btn-danger" (click)="app.eliminar()">
-          <i class="fa-solid fa-trash me-2"></i>
+        <button class="btn btn-secondary" (click)="app.eliminar()">
+          <i class="fa-solid fa-trash-can me-1"></i>
           Eliminar
         </button>
       </td>
