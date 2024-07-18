@@ -1,5 +1,6 @@
 import { NgZone } from "@angular/core";
 import { ElectronService } from "src/app/services/electron.service";
+import { Terminal } from "./Terminal";
 
 export class Git {
   
@@ -11,8 +12,9 @@ export class Git {
   private electronService: ElectronService;
   private ngZone: NgZone;
   private intervaloTareasPeriodicas: any;
+  private terminal: Terminal;
 
-  constructor(rutaRepo: string, puerto: number, electronService: ElectronService, ngZone: NgZone){
+  constructor(rutaRepo: string, puerto: number, electronService: ElectronService, ngZone: NgZone, terminal: Terminal){
     this.rutaRepo = rutaRepo;
     this.puerto = puerto;
     this.ramaActual = "";
@@ -20,6 +22,7 @@ export class Git {
     this.ramaDesactualizada = false;
     this.electronService = electronService;
     this.ngZone = ngZone;
+    this.terminal = terminal;
     this.observarRamaGit();
     this.intervaloTareasPeriodicas = setInterval(this.tareasPeriodicas, 5000);
   }
@@ -62,10 +65,13 @@ export class Git {
       rama: rama
     }
     this.electronService.invoke("git-checkout", body)
-      .then(ok => {
-        if(ok){
+      .then((response: {ok: boolean, mensajes: string[]}) => {
+        if(response.ok){
           this.ramaActual = rama;
         }
+        response.mensajes.forEach(mensaje => {
+          this.terminal.agregarMensaje(mensaje)
+        })
       });
   };
 
@@ -108,10 +114,13 @@ export class Git {
   gitPull(): void {
     const rutaRepo = this.rutaRepo;
     this.electronService.invoke("git-pull", rutaRepo)
-      .then((ok: boolean) => {
-        if(ok){
+      .then((response: {ok: boolean, mensajes: string[]}) => {
+        if(response.ok){
           this.ramaDesactualizada = false;
         }
+        response.mensajes.forEach(mensaje => {
+          this.terminal.agregarMensaje(mensaje);
+        })
       });
   }
 

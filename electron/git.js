@@ -83,9 +83,10 @@ ipcMain.handle('git-pull', async (event, rutaRepo) => {
   return new Promise((resolve, reject) => {
     exec(`cd ${rutaRepo} && git pull`, (error, stdout, stderr) => {
       if (error || stderr) {
-        resolve(false);
+        resolve({ok: false, mensajes: ['Ocurrio un error al hacer git pull']});
       }
-      resolve(true);
+      const mensajes = stdout.split('\n').map(mensaje => mensaje.trim());
+      resolve({ok: true, mensajes: mensajes});
     });
   })
 });
@@ -96,7 +97,14 @@ ipcMain.handle('git-checkout', async (event, body) => {
   const rama = body[0].rama;
   return new Promise((resolve, reject) => {
     exec(`cd ${rutaRepo} && git checkout ${rama}`, (error, stdout, stderr) => {
-      resolve(!(error || stderr));
+      if(error){
+        resolve({ok: false, mensajes: [error]});
+      }
+      if(stderr){
+        resolve({ok: false, mensajes: [stderr]});
+      }
+      const mensajes = stdout.split('\n').map(linea => linea.trim());
+      resolve({ok: true, mensajes: mensajes})
     });
   })
 });

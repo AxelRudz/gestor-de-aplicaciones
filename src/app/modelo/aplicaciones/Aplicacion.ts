@@ -28,9 +28,9 @@ export abstract class Aplicacion {
     this.nombre = nombre;
     this.puerto = puerto;
     this.ruta = ruta;
-    this.git = new Git(ruta, puerto, electronService, ngZone);
     this.estado = new Estado();
     this.terminal = new Terminal();    
+    this.git = new Git(ruta, puerto, electronService, ngZone, this.terminal);
     this.electronService = electronService;
     this.aplicacionService = aplicacionService;
     this.ngZone = ngZone;

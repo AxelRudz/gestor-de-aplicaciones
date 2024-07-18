@@ -3,10 +3,8 @@
     <tr class="text-center">
       <th style="border-radius: 10px 0 0 0;">Aplicación</th>
       <th>Puerto</th>
-      <th>Estado</th>
       <th>Rama actual</th>
       <th></th>
-      <th></th>    
       <th style="border-radius: 0 10px 0 0;"></th>
     </tr>
   </thead>
@@ -20,14 +18,13 @@
         </div>
       </td>
       <td>{{app.getPuerto()}}</td>
-      <td>{{app.getEstado().estaEnEjecucion() ? "🟢" : "🔴"}}</td>    
       <td>
-        <div *ngIf="!hayMuchasRamas(app)" class="td-rama">
+        <div *ngIf="!hayMuchasRamas(app)" class="td-rama d-inline-block" [class.text-warning]="app.getGit().getRamaDesactualizada()">
           <i class="fa-solid fa-code-branch me-2"></i>
           {{app.getGit().getRamaActual()}}
         </div>
-        <div *ngIf="hayMuchasRamas(app)" class="dropdown td-rama">
-          <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <div *ngIf="hayMuchasRamas(app)" class="dropdown td-rama d-inline-block">
+          <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" [class.text-warning]="app.getGit().getRamaDesactualizada()">
             <i class="fa-solid fa-code-branch me-2"></i>
             {{app.getGit().getRamaActual()}}
           </div>
@@ -42,14 +39,12 @@
             </ng-container>
           </ul>
         </div>
-      </td>
-      <td>
-        <div *ngIf="app.getGit().getRamaDesactualizada()" class="alert alert-warning p-2" role="alert" style="width: fit-content; margin: 0 auto">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          Tu rama local está desactualizada.
-          <div (click)="app.getGit().gitPull()" class="git-pull-link">
-            Git pull
-          </div>
+        <div
+          *ngIf="app.getGit().getRamaDesactualizada()"
+          class="git-pull-link"
+          (click)="app.getGit().gitPull()"
+        >
+          Git pull
         </div>
       </td>
       <td>

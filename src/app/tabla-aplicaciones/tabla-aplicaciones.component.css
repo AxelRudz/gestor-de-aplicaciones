@@ -4,15 +4,12 @@ th, td {
   margin: auto 0;
 }
 
-.custom-tooltip {
-  --bs-tooltip-bg: var(--bd-violet-bg);
-  --bs-tooltip-color: var(--bs-white);
-}
-
 .git-pull-link {
   display: inline-block;
+  font-weight: bold;
   color: var(--bs-primary);
   cursor: pointer;
+  margin-left: 20px;
 }
 
 .git-pull-link:hover {
