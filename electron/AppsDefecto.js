@@ -2,6 +2,9 @@ const { ipcMain } = require('electron')
 const { exec } = require('child_process');
 var treeKill = require('tree-kill');
 
+// {puerto, proceso}[]
+let aplicacionesCorriendo = [];
+
 ipcMain.on('obtener-estado-puerto', async (event, puerto) => {
   const isPortActive = await checkPort(puerto);
   event.sender.send(`respuesta-estado-puerto-${puerto}`, isPortActive);
@@ -28,7 +31,20 @@ function matarApp(pid){
   });
 }
 
+const matarTodasLasApps = () => {
+  aplicacionesCorriendo.forEach(app => {
+    matarApp(app.proceso.pid)
+    .then(ok => {
+      if(ok){
+        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo != app);
+      }
+    })
+  })
+}
+
 module.exports = {
   checkPort,
-  matarApp
+  matarApp,
+  matarTodasLasApps,
+  aplicacionesCorriendo
 }

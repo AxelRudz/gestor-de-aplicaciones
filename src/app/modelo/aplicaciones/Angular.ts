@@ -11,7 +11,7 @@ export class Angular extends Aplicacion {
     const puerto = this.getPuerto();
     const abrir = true;
 
-    this.getTerminal().setMensajes(["Iniciando aplicacion..."]);
+    this.getTerminal().setMensajes(["Iniciando aplicación..."]);
     this.electronService.send("iniciar-app-angular", {ruta, puerto, abrir})
     this.electronService.on(`iniciar-app-angular-${puerto}`, (event: any, mensaje: string) => {  
       this.ngZone.run(() => {
@@ -33,18 +33,6 @@ export class Angular extends Aplicacion {
         this.getTerminal().setMensajes(ok ? ["Aplicación detenida."] : ["Ocurrió un error deteniendo la app."]);
         return ok;
       })
-  }
-
-  override eliminar(): void {
-    this.detener()
-    .then(ok => {
-      this.ngZone.run(() => {
-        if(ok){
-          this.aplicacionService.eliminarAplicacion(this.getPuerto());
-          this.getGit().removeListeners();
-        }
-      });
-    })    
   }
   
 }

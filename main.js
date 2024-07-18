@@ -1,10 +1,11 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron')
-const path = require('path')
+const path = require('path');
+const { matarTodasLasApps } = require('./electron/AppsDefecto');
 
 // Demas funciones de la app
-const { matarTodasLasAppsAngular } = require('./electron/AppsAngular');
 require('./electron/AppsDefecto');
 require('./electron/AppsAngular');
+require('./electron/AppsSpringBoot');
 require('./electron/git');
 
 require('electron-reload')(path.join(__dirname, 'dist'), {
@@ -48,7 +49,7 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    matarTodasLasAppsAngular();
+    matarTodasLasApps();
     app.quit()
   }
 })

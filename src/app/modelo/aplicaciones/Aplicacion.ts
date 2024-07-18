@@ -38,8 +38,19 @@ export abstract class Aplicacion {
 
   abstract getLogoUrl(): string;
   abstract iniciar(): void;
-  abstract detener(): void;
-  abstract eliminar(): void;
+  abstract detener(): Promise<boolean>;
+
+  eliminar(): void {
+    this.detener()
+    .then(ok => {
+      this.ngZone.run(() => {
+        if(ok){
+          this.aplicacionService.eliminarAplicacion(this.getPuerto());
+          this.getGit().removeListeners();
+        }
+      });
+    })    
+  }
 
   getNombre(): string {
     return this.nombre;
