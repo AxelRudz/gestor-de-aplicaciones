@@ -40,7 +40,7 @@ const matarApp = (app) => {
   return new Promise((resolve, reject) => {
     treeKill(app.proceso.pid, 'SIGTERM', (err) => {
       if(!err){
-        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo != app);
+        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo.puerto != app.puerto);
       }
       resolve(!err);
     });
@@ -48,14 +48,19 @@ const matarApp = (app) => {
 }
 
 const matarTodasLasApps = () => {
-  aplicacionesCorriendo.forEach(app => {
-    matarApp(app)
-  })
+  aplicacionesCorriendo.forEach(app => matarApp(app))
+}
+
+const getAplicacionesCorriendo = () => {
+  return aplicacionesCorriendo;
+}
+
+const agregarAplicacionCorriendo = (app) => {
+  aplicacionesCorriendo.push(app)
 }
 
 module.exports = {
-  checkPort,
-  matarApp,
   matarTodasLasApps,
-  aplicacionesCorriendo
+  getAplicacionesCorriendo,
+  agregarAplicacionCorriendo
 }

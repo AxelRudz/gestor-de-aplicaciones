@@ -32,5 +32,21 @@ export class AplicacionService {
     this.aplicacionesSubject.next(this.aplicaciones);
   }
 
+  iniciarTodasLasAplicaciones(): void {
+    this.aplicaciones.forEach(aplicacion => {
+      if(aplicacion.getEstado().estaEnEjecucion() == false){
+        aplicacion.iniciar();
+      }
+    })
+  }
+
+  detenerTodasLasAplicaciones(): void {
+    this.aplicaciones.forEach(aplicacion => {
+      if(aplicacion.getEstado().estaEnEjecucion() == true){
+        aplicacion.detener();
+      }
+    })
+  }
+
 
 }

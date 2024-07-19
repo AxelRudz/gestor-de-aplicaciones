@@ -1,13 +1,27 @@
 <!-- <router-outlet></router-outlet> -->
 
 <div class="container">
-  <button class="btn btn-primary d-block mx-auto my-5" data-bs-toggle="modal" data-bs-target="#modalAgregarApp">
-    <i class="fa-solid fa-plus me-2"></i>
-    Agregar aplicación
-  </button>
+  <div class="d-flex justify-content-center align-items-center my-5">
+
+    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAgregarApp">
+      <i class="fa-solid fa-plus me-2"></i>
+      Agregar aplicación
+    </button>
+
+    <ng-container *ngIf="aplicaciones.length > 0">
+      <button *ngIf="!estanTodasLasAplicacionesCorriendo()" (click)="iniciarTodasLasAplicaciones()" class="btn btn-primary ms-2">
+        <i class="fa-solid fa-play me-2"></i>
+        Iniciar todas
+      </button>
+      <button *ngIf="estanTodasLasAplicacionesCorriendo()" (click)="detenerTodasLasAplicaciones()" class="btn btn-danger ms-2">
+        <i class="fa-solid fa-stop me-2"></i>
+        Detener todas
+      </button>
+    </ng-container>
+    
+  </div>
   
   <app-tabla-aplicaciones></app-tabla-aplicaciones>
-  
   
   <app-terminales-apps></app-terminales-apps>
 </div>
