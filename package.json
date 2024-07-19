@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "electron": "ng build && electron .",
-    "electron:serve": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && electron .\""
+    "electron:serve": "concurrently \"ng serve --port 4000\" \"wait-on http://localhost:4000 && electron .\""
   },
   "private": true,
   "dependencies": {

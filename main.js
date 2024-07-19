@@ -29,7 +29,7 @@ function createWindow () {
     }
   })
 
-  win.loadURL(`http://localhost:4200`); //Sirve para el hot reload
+  win.loadURL(`http://localhost:4000`); //Sirve para el hot reload
   //win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`);
 
   win.webContents.openDevTools();
@@ -96,7 +96,7 @@ ipcMain.handle('persistencia-agregar-aplicacion', async (event, linea) => {
       // Leer el archivo para asegurarse de que existe
       await fs.promises.readFile(filePath, 'utf-8');
       // Agregar la nueva línea al final del archivo
-      await fs.promises.appendFile(filePath, `${linea}\n`);
+      await fs.promises.appendFile(filePath, `\n${linea}`);
       resolve(true)
     }
     catch(error){
