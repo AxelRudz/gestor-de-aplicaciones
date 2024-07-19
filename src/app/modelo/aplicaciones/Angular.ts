@@ -14,10 +14,8 @@ export class Angular extends Aplicacion {
     this.getTerminal().setMensajes(["Iniciando aplicación..."]);
     this.electronService.send("iniciar-app-angular", {ruta, puerto, abrir})
     this.electronService.on(`iniciar-app-angular-${puerto}`, (event: any, mensaje: string) => {  
-      this.ngZone.run(() => {
-        this.getEstado().setEnEjecucion(true);
-        this.getTerminal().agregarMensaje(mensaje);
-      });
+      this.getEstado().setEnEjecucion(true);
+      this.getTerminal().agregarMensaje(mensaje);
     });
   }  
 

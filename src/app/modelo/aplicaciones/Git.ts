@@ -1,4 +1,3 @@
-import { NgZone } from "@angular/core";
 import { ElectronService } from "src/app/services/electron.service";
 import { Terminal } from "./Terminal";
 
@@ -10,18 +9,16 @@ export class Git {
   private ramasDisponibles: string[];
   private ramaDesactualizada: boolean;
   private electronService: ElectronService;
-  private ngZone: NgZone;
   private intervaloTareasPeriodicas: any;
   private terminal: Terminal;
 
-  constructor(rutaRepo: string, puerto: number, electronService: ElectronService, ngZone: NgZone, terminal: Terminal){
+  constructor(rutaRepo: string, puerto: number, electronService: ElectronService, terminal: Terminal){
     this.rutaRepo = rutaRepo;
     this.puerto = puerto;
     this.ramaActual = "";
     this.ramasDisponibles = [];
     this.ramaDesactualizada = false;
-    this.electronService = electronService;
-    this.ngZone = ngZone;
+    this.electronService = electronService;  
     this.terminal = terminal;
     this.observarRamaGit();
     this.intervaloTareasPeriodicas = setInterval(this.tareasPeriodicas, 5000);
@@ -80,9 +77,7 @@ export class Git {
     const ruta = this.rutaRepo;    
     this.electronService.send("observar-rama-git", {puerto, ruta})
     this.electronService.on(`respuesta-observar-rama-git-${puerto}`, (event: any, response: {ruta: string, nombre: string}) => {  
-      this.ngZone.run(() => {
-        this.setRamaActual(response.nombre);
-      });
+      this.setRamaActual(response.nombre);
     });
   }
 

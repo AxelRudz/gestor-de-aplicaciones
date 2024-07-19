@@ -20,11 +20,15 @@ export class ElectronService {
     }
   }
 
-  public on(channel: string, listener: any): void {
+  public on(channel: string, listener: (...args: any[]) => void): void {
     if (!this.ipc) {
       return;
     }
-    this.ipc.on(channel, listener);
+    this.ipc.on(channel, (event, ...args) => {
+      this.ngZone.run(() => {
+        listener(event, ...args);
+      });
+    });
   }
   
   public once(channel: string, listener: any): void {
@@ -54,11 +58,7 @@ export class ElectronService {
         this.ngZone.run(() => {
           resolve(result);
         });
-      }).catch((error) => {
-        this.ngZone.run(() => {
-          reject(error);
-        });
-      });
+      })
     });
   }
    

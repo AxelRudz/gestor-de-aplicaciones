@@ -2,7 +2,6 @@ import { Estado } from "./Estado";
 import { Git } from "./Git";
 import { Terminal } from "./Terminal";
 import { ElectronService } from "src/app/services/electron.service";
-import { NgZone } from "@angular/core";
 import { AplicacionService } from "src/app/services/aplicacion.service";
 
 export abstract class Aplicacion {
@@ -15,7 +14,6 @@ export abstract class Aplicacion {
   private terminal: Terminal;
   protected electronService: ElectronService;  
   protected aplicacionService: AplicacionService;
-  protected ngZone: NgZone;
 
   constructor(
     nombre: string,
@@ -23,17 +21,15 @@ export abstract class Aplicacion {
     ruta: string,
     electronService: ElectronService,
     aplicacionService: AplicacionService,
-    ngZone: NgZone
   ){
     this.nombre = nombre;
     this.puerto = puerto;
     this.ruta = ruta;
     this.estado = new Estado();
     this.terminal = new Terminal();    
-    this.git = new Git(ruta, puerto, electronService, ngZone, this.terminal);
+    this.git = new Git(ruta, puerto, electronService, this.terminal);
     this.electronService = electronService;
     this.aplicacionService = aplicacionService;
-    this.ngZone = ngZone;
   }
 
   abstract getLogoUrl(): string;
@@ -43,12 +39,10 @@ export abstract class Aplicacion {
   eliminar(): void {
     this.detener()
     .then(ok => {
-      this.ngZone.run(() => {
-        if(ok){
-          this.aplicacionService.eliminarAplicacion(this.getPuerto());
-          this.getGit().removeListeners();
-        }
-      });
+      if(ok){
+        this.aplicacionService.eliminarAplicacion(this.getPuerto());
+        this.getGit().removeListeners();
+      }
     })    
   }
 

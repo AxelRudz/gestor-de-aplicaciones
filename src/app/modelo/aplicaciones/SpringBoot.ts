@@ -13,10 +13,8 @@ export class SpringBoot extends Aplicacion {
     this.getTerminal().setMensajes(["Iniciando aplicación..."]);
     this.electronService.send("iniciar-app-spring-boot", {ruta, puerto})
     this.electronService.on(`iniciar-app-spring-boot-${puerto}`, (event: any, mensaje: string) => {  
-      this.ngZone.run(() => {
-        this.getEstado().setEnEjecucion(true);
-        this.getTerminal().agregarMensaje(mensaje);
-      });
+      this.getEstado().setEnEjecucion(true);
+      this.getTerminal().agregarMensaje(mensaje);
     });
   }  
 
