@@ -22,7 +22,7 @@ export class Angular extends Aplicacion {
   override detener(): Promise<boolean> {
     const puerto = this.getPuerto();
     this.getTerminal().setMensajes(["Deteniendo aplicación..."]);
-    return this.electronService.invoke('detener-app-angular', puerto)
+    return this.electronService.invoke('detener-app', puerto)
       .then(ok => {
         if(ok){
           this.electronService.removeAllListeners(`iniciar-app-angular-${puerto}`)

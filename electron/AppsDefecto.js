@@ -10,6 +10,19 @@ ipcMain.on('obtener-estado-puerto', async (event, puerto) => {
   event.sender.send(`respuesta-estado-puerto-${puerto}`, isPortActive);
 });
 
+ipcMain.handle('detener-app', async (event, puerto) => {
+  return new Promise((resolve, reject) => {
+    const app = aplicacionesCorriendo.find(app => app.puerto == puerto);
+    if(app){
+      matarApp(app)
+      .then(ok => {
+        resolve(ok);
+      })
+    }
+    resolve(true);
+  });
+});
+
 function checkPort(port){
   return new Promise((resolve, reject) => {
     exec(`netstat -an | findstr :${port}`, (error, stdout, stderr) => {
@@ -23,9 +36,12 @@ function checkPort(port){
   });
 }
 
-function matarApp(pid){
+const matarApp = (app) => {
   return new Promise((resolve, reject) => {
-    treeKill(pid, 'SIGTERM', (err) => {
+    treeKill(app.proceso.pid, 'SIGTERM', (err) => {
+      if(!err){
+        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo != app);
+      }
       resolve(!err);
     });
   });
@@ -33,12 +49,7 @@ function matarApp(pid){
 
 const matarTodasLasApps = () => {
   aplicacionesCorriendo.forEach(app => {
-    matarApp(app.proceso.pid)
-    .then(ok => {
-      if(ok){
-        aplicacionesCorriendo = aplicacionesCorriendo.filter(appCorriendo => appCorriendo != app);
-      }
-    })
+    matarApp(app)
   })
 }
 

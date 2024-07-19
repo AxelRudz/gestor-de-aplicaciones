@@ -1,6 +1,6 @@
 const { ipcMain } = require('electron');
 const { spawn } = require('child_process');
-const { matarApp, aplicacionesCorriendo } = require('./AppsDefecto');
+const { aplicacionesCorriendo } = require('./AppsDefecto');
 
 ipcMain.on('iniciar-app-angular', async (event, {ruta, puerto, abrir}) => {  
   
@@ -22,18 +22,4 @@ ipcMain.on('iniciar-app-angular', async (event, {ruta, puerto, abrir}) => {
       event.sender.send(`iniciar-app-angular-${puerto}`, error.toString());
     });
   }
-});
-
-ipcMain.handle('detener-app-angular', async (event, puerto) => {
-  return new Promise((resolve, reject) => {
-    const app = aplicacionesCorriendo.find(app => app.puerto == puerto);
-    if(app){
-      matarApp(app.proceso.pid)
-      .then(ok => {
-        aplicacionesCorriendo = aplicacionesCorriendo.filter(aplicacionCorriendo => aplicacionCorriendo != app);
-        resolve(ok);
-      })
-    }
-    resolve(true);
-  });
 });
