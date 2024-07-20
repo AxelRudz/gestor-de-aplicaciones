@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
 import { Subscription } from 'rxjs';
 import { AplicacionService } from '../services/aplicacion.service';
@@ -10,6 +10,8 @@ import { Angular } from '../modelo/aplicaciones/Angular';
   styleUrls: ['./tabla-aplicaciones.component.css']
 })
 export class TablaAplicacionesComponent {
+
+  @Output() seInteractuoConUnaApp: EventEmitter<Aplicacion> = new EventEmitter<Aplicacion>();
 
   aplicaciones: Aplicacion[] = [];
 
@@ -37,6 +39,27 @@ export class TablaAplicacionesComponent {
 
   estaEnEjecucion(app: Aplicacion): boolean {
     return app.getEstado().estaEnEjecucion();
+  }
+
+  toggleApp(app: Aplicacion): void {
+    this.estaEnEjecucion(app)
+      ? app.detener()
+      : app.iniciar()
+    this.emitirCambioApp(app);
+  }
+
+  moverseDeRama(app: Aplicacion, rama: string){
+    app.getGit().gitCheckout(rama);
+    this.emitirCambioApp(app);
+  }
+
+  gitPull(app: Aplicacion){
+    app.getGit().gitPull();
+    this.emitirCambioApp(app);
+  }
+
+  emitirCambioApp(app: Aplicacion){
+    this.seInteractuoConUnaApp.emit(app);
   }
 
 

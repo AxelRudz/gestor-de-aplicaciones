@@ -30,7 +30,7 @@
           </div>
           <ul class="dropdown-menu dropdown-menu">
             <ng-container *ngFor="let rama of app.getGit().getRamasDisponibles(); let i = index">
-              <li (click)="app.getGit().gitCheckout(rama)">
+              <li (click)="moverseDeRama(app, rama)">
                 <a class="dropdown-item" href="#">
                   <i class="fa-solid fa-code-branch me-2"></i>
                   {{rama}}
@@ -42,7 +42,7 @@
         <div
           *ngIf="app.getGit().getRamaDesactualizada()"
           class="git-pull-link"
-          (click)="app.getGit().gitPull()"
+          (click)="gitPull(app)"
         >
           Git pull
         </div>
@@ -50,7 +50,7 @@
       <td>
         <button class="btn"
           [ngClass]="estaEnEjecucion(app) ? 'btn-danger':'btn-primary'"
-          (click)="estaEnEjecucion(app) ? app.detener() : app.iniciar()"
+          (click)="toggleApp(app)"
         >
           <i class="fa-solid me-2" [ngClass]="estaEnEjecucion(app) ? 'fa-stop':'fa-play'"></i>
           {{estaEnEjecucion(app) ? 'Detener' : 'Iniciar'}}

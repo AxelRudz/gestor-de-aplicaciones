@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AplicacionService } from '../services/aplicacion.service';
 import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
 
@@ -9,9 +9,9 @@ import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
 })
 export class TerminalesAppsComponent {
 
-  apps: Aplicacion[] = [];
+  @Input({required: true}) appElegida!: Aplicacion | null;
 
-  appElegida: Aplicacion | null = null;
+  apps: Aplicacion[] = [];
 
   constructor(
     private aplicacionService: AplicacionService

@@ -1,26 +1,11 @@
 const { ipcMain } = require('electron');
-const { spawn } = require('child_process');
-const { getAplicacionesCorriendo, agregarAplicacionCorriendo } = require('./AppsDefecto');
+const { gestorDeApps } = require('./GestorDeApps');
 
-ipcMain.on('iniciar-app-spring-boot', async (event, {ruta, puerto}) => {  
+ipcMain.on('iniciar-app-spring-boot', async (event, {ruta, puerto, abrir}) => {  
   
   const comando = `cd ${ruta} && mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=${puerto}`;
-  
+  const canalRespuesta = `respuesta-iniciar-app-spring-boot-${puerto}`;
 
-  if(!getAplicacionesCorriendo().some(appYaCorriendo => appYaCorriendo.puerto == puerto)){
-    const child = spawn(comando, {
-      shell: true,
-    });
-    agregarAplicacionCorriendo({puerto: puerto, proceso: child});
-    child.stdout.on('data', (data) => {
-      // Enviar datos a Angular (a través de IPC o como prefieras)
-      console.log(`stdout: ${data}`);
-      event.sender.send(`iniciar-app-spring-boot-${puerto}`, data.toString());
-    });
-  
-    child.stderr.on('data', (error) => {
-      console.error(`stderr: ${error}`);
-      event.sender.send(`iniciar-app-spring-boot-${puerto}`, error.toString());
-    });
-  }
+  gestorDeApps.iniciarAplicacion(event, puerto, comando, canalRespuesta);
+
 });

@@ -14,6 +14,8 @@ export class AppComponent {
   aplicaciones: Aplicacion[] = [];
   suscripcion!: Subscription;
 
+  appElegidaParaVerTerminal: Aplicacion | null = null;
+
   constructor(private aplicacionService: AplicacionService){}
 
   ngOnInit(){
@@ -34,5 +36,9 @@ export class AppComponent {
 
   detenerTodasLasAplicaciones(): void {
     this.aplicacionService.detenerTodasLasAplicaciones();
+  }
+
+  mostrarTerminalDeApp(app: Aplicacion): void {
+    this.appElegidaParaVerTerminal = app;
   }
 }

@@ -1,9 +1,9 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain, nativeTheme } = require('electron')
 const path = require('path');
-const { matarTodasLasApps } = require('./electron/AppsDefecto');
 const fs = require('fs');
 
-// Demas funciones de la app
+// Importo los otros archivos de mi app
+const { gestorDeApps } = require('./electron/GestorDeApps');
 require('./electron/AppsDefecto');
 require('./electron/AppsAngular');
 require('./electron/AppsSpringBoot');
@@ -29,6 +29,8 @@ function createWindow () {
     }
   })
 
+  nativeTheme.themeSource = "dark";
+
   win.loadURL(`http://localhost:4000`); //Sirve para el hot reload
   //win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`);
 
@@ -48,9 +50,9 @@ app.whenReady().then(() => {
   })
 })
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
   if (process.platform !== 'darwin') {
-    matarTodasLasApps();
+    await gestorDeApps.detenerTodasLasApps();
     app.quit()
   }
 })

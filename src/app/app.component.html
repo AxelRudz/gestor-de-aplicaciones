@@ -21,9 +21,11 @@
     
   </div>
   
-  <app-tabla-aplicaciones></app-tabla-aplicaciones>
+  <app-tabla-aplicaciones
+    (seInteractuoConUnaApp)="mostrarTerminalDeApp($event)"
+  ></app-tabla-aplicaciones>
   
-  <app-terminales-apps></app-terminales-apps>
+  <app-terminales-apps [appElegida]="appElegidaParaVerTerminal"></app-terminales-apps>
 </div>
 
 <!-- Modals -->
