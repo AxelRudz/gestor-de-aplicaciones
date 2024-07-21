@@ -1,7 +1,9 @@
 {
   "name": "gestor-de-aplicaciones",
   "main": "main.js",
-  "version": "0.0.0",
+  "description": "Gestor de aplicaciones",
+  "author": {"name": "Axel rudz", "email": "axelrudz@gmail.com"},
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -9,7 +11,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "electron": "ng build && electron .",
-    "electron:serve": "concurrently \"ng serve --port 4000\" \"wait-on http://localhost:4000 && electronmon . --background\""
+    "electron:serve": "concurrently \"ng serve --port 4000\" \"wait-on http://localhost:4000 && electronmon . --background\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "type": "module",
   "private": true,
@@ -35,6 +39,7 @@
     "@types/jasmine": "~4.3.0",
     "concurrently": "^8.2.2",
     "electron": "^31.1.0",
+    "electron-builder": "^24.13.3",
     "electronmon": "^2.0.3",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
@@ -44,5 +49,37 @@
     "karma-jasmine-html-reporter": "~2.0.0",
     "typescript": "~5.0.2",
     "wait-on": "^7.2.0"
+  },
+  "build": {
+    "asar": true,
+    "appId": "axelrudz.gestor-de-aplicaciones",
+    "productName": "GESTOR DE APLICACIONES - PLATINUM EDITION",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "main.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "Gestor de aplicaciones - PLATINUM EDITION.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": true,
+      "shortcutName": "Gestor de aplicaciones",
+      "installerIcon": "./src/assets/icono3.ico",
+      "uninstallerIcon": "./src/assets/icono3.ico",
+      "installerHeaderIcon": "./src/assets/icono3.ico"
+    }
   }
 }
