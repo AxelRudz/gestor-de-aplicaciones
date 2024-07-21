@@ -22,7 +22,7 @@ function createWindow () {
 
   win = new BrowserWindow({
     title: "Gestor de aplicaciones",
-    icon: "./src/assets/logo-angular.png",
+    icon: "./src/assets/icono3.ico",
     width: 1200,
     height: 900,
     resizable: true,
@@ -38,7 +38,7 @@ function createWindow () {
   win.loadURL(`http://localhost:4000`); //Sirve para el hot reload
   //win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`);
 
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
 
   win.setMenu(null);
 
