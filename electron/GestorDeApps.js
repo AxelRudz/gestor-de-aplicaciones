@@ -1,5 +1,6 @@
-const treeKill = require("tree-kill");
-const { spawn } = require("child_process");
+import treeKill from "tree-kill";
+import { spawn } from "child_process";
+import stripAnsi from "strip-ansi";
 
 class GestorDeApps {
   // { puerto: numero de puerto (usado como identificador), proceso: proceso que esta corriendo la app }[]
@@ -31,12 +32,12 @@ class GestorDeApps {
       // Voy devolviendo los resultados por el canal de respuesta`
       child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
-        event.sender.send(`${canalRespuesta}`, data.toString());
+        event.sender.send(`${canalRespuesta}`, stripAnsi(data.toString()));
       });
     
       child.stderr.on('data', (error) => {
         console.error(`stderr: ${error}`);
-        event.sender.send(`${canalRespuesta}`, error.toString());
+        event.sender.send(`${canalRespuesta}`, stripAnsi(error.toString()));
       });
     }
     else {
@@ -83,8 +84,4 @@ class GestorDeApps {
   }
 }
 
-const gestorDeApps = new GestorDeApps();
-
-module.exports = {
-  gestorDeApps
-}
+export const gestorDeApps = new GestorDeApps();

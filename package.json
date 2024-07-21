@@ -9,8 +9,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "electron": "ng build && electron .",
-    "electron:serve": "concurrently \"ng serve --port 4000\" \"wait-on http://localhost:4000 && electron .\""
+    "electron:serve": "concurrently \"ng serve --port 4000\" \"wait-on http://localhost:4000 && electronmon . --background\""
   },
+  "type": "module",
   "private": true,
   "dependencies": {
     "@angular/animations": "^16.0.0",
@@ -22,6 +23,7 @@
     "@angular/platform-browser-dynamic": "^16.0.0",
     "@angular/router": "^16.0.0",
     "rxjs": "~7.8.0",
+    "strip-ansi": "^7.1.0",
     "tree-kill": "^1.2.2",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
@@ -33,7 +35,7 @@
     "@types/jasmine": "~4.3.0",
     "concurrently": "^8.2.2",
     "electron": "^31.1.0",
-    "electron-reload": "^2.0.0-alpha.1",
+    "electronmon": "^2.0.3",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

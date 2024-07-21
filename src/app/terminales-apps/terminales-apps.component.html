@@ -21,7 +21,7 @@
   <div *ngIf="appElegida" class="card card-body terminal">
     <p><span class="text-primary d-inline"><b>{{appElegida.getNombre()}}</b></span> {{appElegida.getRuta()}}</p>
     <p *ngFor="let mensaje of appElegida.getTerminal().getMensajes()">
-      {{mensaje}}
+      {{ mensaje }}
     </p>
   </div>
 </ng-container>

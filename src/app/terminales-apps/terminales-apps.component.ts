@@ -13,9 +13,7 @@ export class TerminalesAppsComponent {
 
   apps: Aplicacion[] = [];
 
-  constructor(
-    private aplicacionService: AplicacionService
-  ){}
+  constructor(private aplicacionService: AplicacionService){}
 
   ngOnInit(){
     this.aplicacionService.aplicaciones$.subscribe(aplicaciones => {

@@ -1,6 +1,10 @@
-const { ipcMain } = require('electron');
-const { gestorDeApps } = require('./GestorDeApps');
+import { ipcMain } from 'electron';
+import { gestorDeApps } from './GestorDeApps.js';
 
-ipcMain.handle('detener-app', async (event, puerto) => {
-  return gestorDeApps.detenerAplicacion(puerto);
-});
+export function inicializarModuloAppsDefecto(){
+
+  ipcMain.handle('detener-app', async (event, puerto) => {
+    return gestorDeApps.detenerAplicacion(puerto);
+  });
+
+}
