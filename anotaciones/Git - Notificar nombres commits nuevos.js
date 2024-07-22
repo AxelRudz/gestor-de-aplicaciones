@@ -5,6 +5,9 @@
 // Voy consultando cada cierto tiempo y si la consulta tiene mas commits que mi archivo de control,
 // agrego esos commits a mi archivo y muestro la informacion de los mismos en una notificacion
 
+// El archivo de control puede tener como nombre la fecha de hoy, de esa forma puedo saber si ya consulté en el dia,
+// debo borrar los archivos anteriores, etc...
+
 // Abajo hay codigo de como uso comandos git, notificaciones, etc...
 
 exec(`cd ${__dirname} && git show --pretty=format:"%H---%an---%s" --no-patch`, (error, stdout, stderr) => {
