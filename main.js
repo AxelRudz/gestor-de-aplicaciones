@@ -35,10 +35,10 @@ function createWindow () {
 
   nativeTheme.themeSource = "dark";
 
-  //win.loadURL(`http://localhost:4000`); //Sirve para el hot reload
-  win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`);
-
-  //win.webContents.openDevTools();
+  win.loadURL(`http://localhost:4000`); // <-- Usado para el hot reload
+  //win.webContents.openDevTools()
+  
+  //win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`); <-- Todavia no estan seteados los ambientes, esto se usa en produccion
 
   win.setMenu(null);
 

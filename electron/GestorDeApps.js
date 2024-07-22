@@ -31,13 +31,17 @@ class GestorDeApps {
       
       // Voy devolviendo los resultados por el canal de respuesta`
       child.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-        event.sender.send(`${canalRespuesta}`, stripAnsi(data.toString()));
+        if(data){
+          console.log(`stdout: ${data}`);
+          event.sender.send(`${canalRespuesta}`, stripAnsi(data.toString()));
+        }
       });
     
       child.stderr.on('data', (error) => {
-        console.error(`stderr: ${error}`);
-        event.sender.send(`${canalRespuesta}`, stripAnsi(error.toString()));
+        if(error){
+          console.error(`stderr: ${error}`);
+          event.sender.send(`${canalRespuesta}`, stripAnsi(error.toString()));
+        }
       });
     }
     else {
