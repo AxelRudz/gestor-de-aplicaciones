@@ -1,0 +1,30 @@
+------------------------------------------------------------------------------------------------------------------------------------
+Muestra una notificacion en el sistema con titulo, descripcion y un icono
+
+import { Notification } from "electron";
+new Notification({ title: 'Gestor de aplicaciones', body: 'Se ha hecho un commit', icon: './src/assets/icono3.ico' }).show();
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+ipcMain.on('obtener-estado-puerto', async (event, puerto) => {
+  const isPortActive = await checkPort(puerto);
+  event.sender.send(`respuesta-estado-puerto-${puerto}`, isPortActive);
+});
+
+function checkPort(port){
+  return new Promise((resolve, reject) => {
+    exec(`netstat -an | findstr :${port}`, (error, stdout, stderr) => {
+      if (error) {
+        resolve(false);
+      } else {
+        // Si hay alguna salida, el puerto está en uso
+        resolve(stdout.includes(`:${port}`));
+      }
+    });
+  });
+}
+
+------------------------------------------------------------------------------------------------------------------------------------
+COMANDO git show --pretty=format:"%H %an %ad %s" --no-patch    ---->  847928fce22cad08fa073626913e07301c7892ff Axel Rudz Sun Jul 21 22:32:42 2024 -0300 Corrijo bug ansi + iconos
+COMANDO git show --pretty=format:"%an %s" --no-patch    ---->  Autor nombre del commit (si no se especifica el git show toma el ultimo)
+------------------------------------------------------------------------------------------------------------------------------------
