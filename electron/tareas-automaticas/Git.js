@@ -117,7 +117,7 @@ function guardarCommitsEnArchivoDeControl(infoRepos){
           fs.writeFileSync(filePath, cambiarrrrrr.join("\n"));
           resolve(true);
         } catch (writeError) {
-          rejects(writeError);
+          rejects(new Promise(()=>{resolve (writeError)}));
         }
       } 
       rejects(new Promise(()=>{resolve (false)}));
