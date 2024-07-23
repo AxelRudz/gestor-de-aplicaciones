@@ -18,6 +18,7 @@ import fs from "fs"
 import util from "util"
 import path from "path";
 import { rejects } from "assert";
+import { shell } from "electron";
 const execPromise = util.promisify(exec);
 
 
@@ -45,59 +46,66 @@ async function guardarCommitsRemotosDeAplicaciones(rutas){
 
   const resultados = await Promise.allSettled(arregloPromesas);
 
-  const listadoCommits = [];
+  // Almacena {ruta: string, commits: string[]}[]
+  const infoRepos = [];
 
   resultados.forEach(result => {
     if (result.status === 'fulfilled') {
-      const commits = result.value.stdout;
-      commits.forEach(commit => {
-        if (!listadoCommits.includes(commit)) {
-          listadoCommits.push(commit);
-        }
-      });
+      const ruta = result.value.stdout.ruta
+      const commits = result.value.stdout.commits;
+      // Si no fue agregado
+      if(!infoRepos.some(repo => repo.ruta == ruta)){
+        infoRepos.push({ruta, commits: commits})
+      }
     }
     else {
       console.error(`Error procesando la ruta: ${result.reason}`);
     }
   })
-  guardarCommitsEnArchivoDeControl(listadoCommits).catch(error => console.error(error))
+  guardarCommitsEnArchivoDeControl(infoRepos).catch(error => console.error(error))
 }
 
 async function promesaListadoCommits(ruta) {
   return execPromise(`cd ${ruta} && git fetch && git log --all --remotes --since="yesterday" --pretty=format:"%H|%an|%s"`)
     .then(({ stdout, stderr }) => {
       if (!stderr) {
-        return { stdout: stdout.split("\n"), stderr: "" };
+        return { stdout: {ruta, commits: stdout.split("\n")}, stderr: "" };
       }
       console.error("Algo salio mal = ", stderr);
-      return { stdout: [], stderr };
+      return { stdout: {ruta, commits: []}, stderr: "" };
     })
     .catch(error => {
       console.error("Algo salio mal = ", error.message);
-      return { stdout: [], stderr: error.message };
+      return { stdout: {ruta, commits: []}, stderr: error.message };
     });
 }
 
-function guardarCommitsEnArchivoDeControl(listadoCommits){  
+// infoRepos es de tipo {ruta: string, commits: string[]}[]
+function guardarCommitsEnArchivoDeControl(infoRepos){  
   return new Promise(() => {
     const path = app.getPath('userData');
     const fechaHoy = new Date().toISOString().split("T")[0];
     const filePath = `${path}/Registro commits ${fechaHoy}`;
     try {
-      const commitsParaNotificar = [];
+      // De tipo {ruta, commit}[]
+      const notificacionesParaEnviar = [];
       // Leer el archivo para asegurarse de que existe
       const archivo = fs.readFileSync(filePath, 'utf-8');
       // Agregar la nueva línea al final del archivo
-      listadoCommits.forEach(commit => {
-        if(!archivo.includes(commit)){
-          fs.appendFileSync(filePath, `\n${commit}`);
-          commitsParaNotificar.push(commit);
-        }
+      infoRepos.forEach(repo => {
+        repo.commits.forEach(commit => {
+          if(!archivo.includes(commit)){
+            fs.appendFileSync(filePath, `\n${commit}`);
+            const ruta = repo.ruta;
+            notificacionesParaEnviar.push({ruta, commit});
+          }
+        })
       })      
-      if(commitsParaNotificar.length <= 5){
-        commitsParaNotificar.forEach(commit => {
-          const [hash, autor, nombreCommit] = commit.split("|");
-          mostrarNotificacion(hash, autor, nombreCommit);
+      if(notificacionesParaEnviar.length <= 5){
+        notificacionesParaEnviar.forEach(rutaCommit => {
+          const ruta = rutaCommit.ruta;
+          const [hash, autor, nombreCommit] = rutaCommit.commit.split("|");
+          mostrarNotificacion(ruta, hash, autor, nombreCommit);
         })
       }
       resolve(true)
@@ -106,7 +114,7 @@ function guardarCommitsEnArchivoDeControl(listadoCommits){
       // Si el archivo no existe, crearlo y agregar la línea
       if (error.code === 'ENOENT') {
         try {
-          fs.writeFileSync(filePath, listadoCommits.join("\n"));
+          fs.writeFileSync(filePath, cambiarrrrrr.join("\n"));
           resolve(true);
         } catch (writeError) {
           rejects(writeError);
@@ -117,7 +125,7 @@ function guardarCommitsEnArchivoDeControl(listadoCommits){
   })
 }
 
-function mostrarNotificacion(hash, autor, nombreCommit){
+function mostrarNotificacion(ruta, hash, autor, nombreCommit){
   const rutaIcono = path.resolve("src", "assets", "icono3.ico");
   const notificacion = new Notification({
     title: `${autor} hizo un commit`,
@@ -127,7 +135,7 @@ function mostrarNotificacion(hash, autor, nombreCommit){
   });
   notificacion.show();
   notificacion.on("click", () => {
-    exec("git remote show origin", (error, stdout) => {
+    exec(`cd ${ruta} && git remote show origin`, (error, stdout) => {
       const lineas = stdout.split("\n");
       let urlRepoRemotoDetectado = lineas.find(linea => linea.trim().includes("Fetch URL: "));
 
