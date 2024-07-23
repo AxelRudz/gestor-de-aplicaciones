@@ -45,7 +45,7 @@ class GestorDeApps {
       });
     }
     else {
-      console.log("La aplicacion con puerto "+puerto+" ya está corriendo y no se puede agregar. Listado = ", this.getAplicacionesCorriendo());
+      console.error("La aplicacion con puerto "+puerto+" ya está corriendo y no se puede agregar. Listado = ", this.getAplicacionesCorriendo());
     }
   }
 
@@ -79,7 +79,6 @@ class GestorDeApps {
         return this.matarProceso(app.proceso.pid)
         .then(ok => {
           if(ok){
-            console.log("Mate la app con puerto "+app.puerto);
             this.aplicacionesCorriendo.splice(index, 1);
           }
         })

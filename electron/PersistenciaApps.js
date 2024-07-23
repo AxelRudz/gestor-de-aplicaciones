@@ -4,17 +4,7 @@ import fs from "fs";
 export function inicializarModuloPersistenciaApps(){
 
   ipcMain.handle('recuperar-aplicaciones-guardadas', async (event) => {
-    return new Promise(async (resolve, reject) => {
-      const path = app.getPath('userData');
-      try {
-        const buf = await fs.promises.readFile(`${path}/ListadoAplicacionesGuardadas`, 'utf-8');
-        const apps = buf.split('\n').filter(linea => linea);
-        resolve(apps)
-      }
-      catch(error){
-        reject(null);
-      }
-    });
+    return recuperarAppsGuardadas();
   });
 
   ipcMain.handle('persistencia-agregar-aplicacion', async (event, linea) => {
@@ -69,5 +59,19 @@ export function inicializarModuloPersistenciaApps(){
         }
       }
     });
+  });
+}
+
+export const recuperarAppsGuardadas = () => {
+  return new Promise(async (resolve, reject) => {
+    const path = app.getPath('userData');
+    try {
+      const buf = await fs.promises.readFile(`${path}/ListadoAplicacionesGuardadas`, 'utf-8');
+      const apps = buf.split('\n').filter(linea => linea);
+      resolve(apps)
+    }
+    catch(error){
+      reject(null);
+    }
   });
 }

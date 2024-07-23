@@ -43,7 +43,7 @@ export class AplicacionService {
         this.aplicacionesSubject.next(this.aplicaciones);
       })
       .catch(error => {
-        console.log("Error al leer el archivo de configuracion: ", error);
+        console.error("Error al leer el archivo de configuracion: ", error);
       })
   }
 

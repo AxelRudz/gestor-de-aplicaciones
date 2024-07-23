@@ -8,21 +8,25 @@ import { inicializarModuloAppsDefecto } from "./electron/AppsDefecto.js"
 import { inicializarModuloAppsSpringBoot } from "./electron/AppsSpringBoot.js";
 import { inicializarModuloGit } from "./electron/git.js";
 import { inicializarModuloPersistenciaApps } from "./electron/PersistenciaApps.js";
+import { inicializarModuloTareasAutomaticas } from "./electron/tareas-automaticas/Git.js";
+
+export const __dirname = import.meta.dirname;
+
 
 inicializarModuloAppsAngular();
 inicializarModuloAppsDefecto();
 inicializarModuloAppsSpringBoot();
 inicializarModuloGit();
 inicializarModuloPersistenciaApps();
+inicializarModuloTareasAutomaticas();
 
 let win;
-const __dirname = import.meta.dirname;
 
 function createWindow () {
 
   win = new BrowserWindow({
     title: "Gestor de aplicaciones",
-    icon: "./src/assets/icono3.ico",
+    icon: path.resolve(__dirname, "src", "assets", "icono3.ico"),
     width: 1200,
     height: 900,
     resizable: true,
@@ -45,6 +49,10 @@ function createWindow () {
 }
 
 app.whenReady().then(() => {
+  if (process.platform == 'win32') {
+    app.setAppUserModelId('Gestor de aplicaciones');
+  }
+
   createWindow()
 
   app.on('activate', () => {
