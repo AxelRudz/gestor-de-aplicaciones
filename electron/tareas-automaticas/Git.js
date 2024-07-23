@@ -114,7 +114,15 @@ function guardarCommitsEnArchivoDeControl(infoRepos){
       // Si el archivo no existe, crearlo y agregar la línea
       if (error.code === 'ENOENT') {
         try {
-          fs.writeFileSync(filePath, cambiarrrrrr.join("\n"));
+          const listadoCommits = [];
+          infoRepos.forEach(repo => {
+            repo.commits.forEach(commit => {
+              if(!listadoCommits.includes(commit)){
+                listadoCommits.push(commit);
+              }
+            })
+          })
+          fs.writeFileSync(filePath, listadoCommits.join("\n"));
           resolve(true);
         } catch (writeError) {
           rejects(new Promise(()=>{resolve (writeError)}));
