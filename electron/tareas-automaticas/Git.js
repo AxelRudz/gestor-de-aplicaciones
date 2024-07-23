@@ -134,7 +134,12 @@ function mostrarNotificacion(hash, autor, nombreCommit){
       if(urlRepoRemotoDetectado){
         const urlRepoRemoto = urlRepoRemotoDetectado.trim().split("Fetch URL: ")[1].trim();
         const urlRepoRemoto2 = urlRepoRemoto.split(".git")[0]+urlRepoRemoto.split(".git")[1];
-        shell.openExternal(`${urlRepoRemoto2}/commit/${hash}`)
+        if(urlRepoRemoto.includes("github")){
+          shell.openExternal(`${urlRepoRemoto2}/commit/${hash}`)
+        }
+        if(urlRepoRemoto.includes("gitlab")){
+          shell.openExternal(`${urlRepoRemoto2}/-/commit/${hash}`)
+        }
       }
     })
   });
