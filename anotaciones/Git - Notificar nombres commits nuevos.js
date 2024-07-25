@@ -19,7 +19,7 @@ exec(`cd ${__dirname} && git show --pretty=format:"%H---%an---%s" --no-patch`, (
   const notificacion = new Notification({
     title: `${autor} ha hecho un commit`,
     body: `${nombreCommit}`,
-    icon: './src/assets/icono3.ico',
+    icon: './src/assets/logo-app.png',
     silent: false
   });
 

@@ -133,7 +133,7 @@ function guardarCommitsEnArchivoDeControl(infoRepos){
 }
 
 function mostrarNotificacion(ruta, hash, autor, nombreCommit){
-  const rutaIcono = path.resolve("src", "assets", "logo-gitlab.ico");
+  const rutaIcono = path.join(__dirname, "../../src/assets/logo-gitlab.ico");
   const notificacion = new Notification({
     title: `${autor} hizo un commit`,
     body: nombreCommit,

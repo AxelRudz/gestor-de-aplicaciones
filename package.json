@@ -60,6 +60,7 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
+      "src/assets/**/*",
       "main.js"
     ],
     "directories": {
@@ -69,6 +70,7 @@
       "target": [
         "nsis"
       ],
+      "icon": "./src/assets/logo-app.png",
       "artifactName": "REPO MANAGER - Platinum Edition.exe"
     },
     "nsis": {
@@ -80,9 +82,9 @@
       "createStartMenuShortcut": true,
       "deleteAppDataOnUninstall": true,
       "shortcutName": "REPO MANAGER - Platinum Edition",
-      "installerIcon": "./src/assets/icono3.ico",
-      "uninstallerIcon": "./src/assets/icono3.ico",
-      "installerHeaderIcon": "./src/assets/icono3.ico"
+      "installerIcon": "./src/assets/logo-app.png",
+      "uninstallerIcon": "./src/assets/logo-app.png",
+      "installerHeaderIcon": "./src/assets/logo-app.png"
     }
   }
 }
