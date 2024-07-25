@@ -10,19 +10,18 @@
 // debo borrar los archivos anteriores, etc...
 
 // Abajo hay codigo de como uso comandos git, notificaciones, etc...
-import { Notification, app } from "electron";
-import { exec } from "child_process"
-import { recuperarAppsGuardadas } from "../PersistenciaApps.js";
-import { __dirname } from "../../main.js"
-import fs from "fs"
-import util from "util"
-import path from "path";
-import { rejects } from "assert";
-import { shell } from "electron";
+const { Notification, app } = require("electron");
+const { exec } = require("child_process");
+const { recuperarAppsGuardadas } = require("../PersistenciaApps.js");
+const fs = require("fs");
+const util = require("util");
+const path = require("path");
+const { rejects } = require("assert");
+const { shell } = require("electron");
 const execPromise = util.promisify(exec);
 
 
-export const inicializarModuloTareasAutomaticas = () => {
+const inicializarModuloTareasAutomaticas = () => {
   setInterval(() => verificarCommitsRemotosRepos(), 5000);
 }
 
@@ -134,12 +133,12 @@ function guardarCommitsEnArchivoDeControl(infoRepos){
 }
 
 function mostrarNotificacion(ruta, hash, autor, nombreCommit){
-  const rutaIcono = path.resolve("src", "assets", "icono3.ico");
+  const rutaIcono = path.resolve("src", "assets", "logo-gitlab.ico");
   const notificacion = new Notification({
     title: `${autor} hizo un commit`,
     body: nombreCommit,
     icon: rutaIcono,
-    silent: true
+    silent: false
   });
   notificacion.show();
   notificacion.on("click", () => {
@@ -159,4 +158,8 @@ function mostrarNotificacion(ruta, hash, autor, nombreCommit){
       }
     })
   });
+}
+
+module.exports = {
+  inicializarModuloTareasAutomaticas
 }

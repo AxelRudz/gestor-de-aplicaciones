@@ -20,8 +20,6 @@
   </div>
   <div *ngIf="appElegida" class="card card-body terminal">
     <p><span class="text-primary d-inline"><b>{{appElegida.getNombre()}}</b></span> {{appElegida.getRuta()}}</p>
-    <p *ngFor="let mensaje of appElegida.getTerminal().getMensajes()">
-      {{ mensaje }}
-    </p>
+    <div [innerHTML]="mensaje" *ngFor="let mensaje of appElegida.getTerminal().getMensajes()"></div>
   </div>
 </ng-container>

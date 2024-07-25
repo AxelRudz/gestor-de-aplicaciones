@@ -1,24 +1,14 @@
-import { app, BrowserWindow, dialog, ipcMain, nativeTheme } from "electron";
-import path from "path";
+const { app, BrowserWindow, dialog, ipcMain, nativeTheme } = require("electron");
+const path = require("path");
 
-// Importo los otros archivos de mi app
-import { gestorDeApps } from"./electron/GestorDeApps.js"
-import { inicializarModuloAppsAngular } from "./electron/AppsAngular.js";
-import { inicializarModuloAppsDefecto } from "./electron/AppsDefecto.js"
-import { inicializarModuloAppsSpringBoot } from "./electron/AppsSpringBoot.js";
-import { inicializarModuloGit } from "./electron/git.js";
-import { inicializarModuloPersistenciaApps } from "./electron/PersistenciaApps.js";
-import { inicializarModuloTareasAutomaticas } from "./electron/tareas-automaticas/Git.js";
-
-export const __dirname = import.meta.dirname;
-
-
-inicializarModuloAppsAngular();
-inicializarModuloAppsDefecto();
-inicializarModuloAppsSpringBoot();
-inicializarModuloGit();
-inicializarModuloPersistenciaApps();
-inicializarModuloTareasAutomaticas();
+// Importo otros archivos de mi app
+require("./electron/AppsAngular.js");
+require("./electron/AppsDefecto.js");
+require("./electron/AppsSpringBoot.js");
+require("./electron/git.js");
+require("./electron/PersistenciaApps.js");
+const { gestorDeApps } = require("./electron/GestorDeApps.js");
+const { inicializarModuloTareasAutomaticas } = require("./electron/tareas-automaticas/Git.js");
 
 let win;
 
@@ -26,32 +16,30 @@ function createWindow () {
 
   win = new BrowserWindow({
     title: "Gestor de aplicaciones",
-    icon: path.resolve(__dirname, "src", "assets", "icono3.ico"),
+    icon: path.join(__dirname, 'src', 'assets', 'icono3.ico'),
     width: 1200,
     height: 900,
-    resizable: true,
+    resizable: true,    
     webPreferences: {
       preload: path.join(__dirname, 'electron', 'preload.cjs'),
       contextIsolation: false,
       nodeIntegration: true,
     }
   })
-
   nativeTheme.themeSource = "dark";
 
-  win.loadURL(`http://localhost:4000`); // <-- Usado para el hot reload
   //win.webContents.openDevTools()
-  
-  //win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`); <-- Todavia no estan seteados los ambientes, esto se usa en produccion
+
+  win.loadURL(`http://localhost:4000`); // <-- Usado para el hot reload
+  //win.loadURL(`file://${__dirname}/dist/gestor-de-aplicaciones/index.html`); //<-- Todavia no estan seteados los ambientes, esto se usa en produccion
 
   win.setMenu(null);
+
+  inicializarModuloTareasAutomaticas();
 
 }
 
 app.whenReady().then(() => {
-  if (process.platform == 'win32') {
-    app.setAppUserModelId('Gestor de aplicaciones');
-  }
 
   createWindow()
 

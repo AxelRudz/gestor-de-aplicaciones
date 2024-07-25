@@ -1,6 +1,7 @@
-import treeKill from "tree-kill";
-import { spawn } from "child_process";
-import stripAnsi from "strip-ansi";
+const treeKill = require("tree-kill");
+const { spawn } = require("child_process");
+var Convert = require('ansi-to-html');
+var convert = new Convert();
 
 class GestorDeApps {
   // { puerto: numero de puerto (usado como identificador), proceso: proceso que esta corriendo la app }[]
@@ -33,14 +34,16 @@ class GestorDeApps {
       child.stdout.on('data', (data) => {
         if(data){
           console.log(`stdout: ${data}`);
-          event.sender.send(`${canalRespuesta}`, stripAnsi(data.toString()));
+          data = data ? convert.toHtml(data.toString()) : data.toString()
+          event.sender.send(`${canalRespuesta}`, data);
         }
       });
     
       child.stderr.on('data', (error) => {
         if(error){
           console.error(`stderr: ${error}`);
-          event.sender.send(`${canalRespuesta}`, stripAnsi(error.toString()));
+          error = convert.toHtml(error.toString())
+          event.sender.send(`${canalRespuesta}`, error);
         }
       });
     }
@@ -87,4 +90,8 @@ class GestorDeApps {
   }
 }
 
-export const gestorDeApps = new GestorDeApps();
+const gestorDeApps = new GestorDeApps();
+
+module.exports = {
+  gestorDeApps
+}
