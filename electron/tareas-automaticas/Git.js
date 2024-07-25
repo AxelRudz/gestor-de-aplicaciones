@@ -65,7 +65,7 @@ async function guardarCommitsRemotosDeAplicaciones(rutas){
 }
 
 async function promesaListadoCommits(ruta) {
-  return execPromise(`cd ${ruta} && git fetch && git log --all --remotes --since="yesterday" --pretty=format:"%H|%an|%s"`)
+  return execPromise(`cd ${ruta} && git fetch && git log --remotes --since="yesterday" --pretty=format:"%H|%an|%s"`)
     .then(({ stdout, stderr }) => {
       if (!stderr) {
         return { stdout: {ruta, commits: stdout.split("\n")}, stderr: "" };
@@ -138,14 +138,13 @@ function mostrarNotificacion(ruta, hash, autor, nombreCommit){
     title: `${autor} hizo un commit`,
     body: nombreCommit,
     icon: rutaIcono,
-    silent: false
+    silent: true
   });
-  notificacion.show();
   notificacion.on("click", () => {
     exec(`cd ${ruta} && git remote show origin`, (error, stdout) => {
       const lineas = stdout.split("\n");
       let urlRepoRemotoDetectado = lineas.find(linea => linea.trim().includes("Fetch URL: "));
-
+      
       if(urlRepoRemotoDetectado){
         const urlRepoRemoto = urlRepoRemotoDetectado.trim().split("Fetch URL: ")[1].trim();
         const urlRepoRemoto2 = urlRepoRemoto.split(".git")[0]+urlRepoRemoto.split(".git")[1];
@@ -158,6 +157,7 @@ function mostrarNotificacion(ruta, hash, autor, nombreCommit){
       }
     })
   });
+  notificacion.show();
 }
 
 module.exports = {

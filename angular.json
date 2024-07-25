@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "gestor-de-aplicaciones": {
+    "repo-manager": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/gestor-de-aplicaciones",
+            "outputPath": "dist/repo-manager",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "gestor-de-aplicaciones:build:production"
+              "browserTarget": "repo-manager:build:production"
             },
             "development": {
-              "browserTarget": "gestor-de-aplicaciones:build:development"
+              "browserTarget": "repo-manager:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -71,7 +71,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "gestor-de-aplicaciones:build"
+            "browserTarget": "repo-manager:build"
           }
         },
         "test": {

@@ -1,5 +1,5 @@
 {
-  "name": "gestor-de-aplicaciones",
+  "name": "repo-manager",
   "main": "main.js",
   "description": "Gestor de aplicaciones",
   "author": {
@@ -55,8 +55,8 @@
   },
   "build": {
     "asar": true,
-    "appId": "Gestor de aplicaciones",
-    "productName": "GESTOR DE APLICACIONES - PLATINUM EDITION",
+    "appId": "REPO MANAGER - Platinum Edition",
+    "productName": "REPO MANAGER - Platinum Edition",
     "files": [
       "dist/**/*",
       "electron/**/*",
@@ -69,7 +69,7 @@
       "target": [
         "nsis"
       ],
-      "artifactName": "Gestor de aplicaciones - PLATINUM EDITION.exe"
+      "artifactName": "REPO MANAGER - Platinum Edition.exe"
     },
     "nsis": {
       "oneClick": false,
@@ -79,7 +79,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "deleteAppDataOnUninstall": true,
-      "shortcutName": "Gestor de aplicaciones",
+      "shortcutName": "REPO MANAGER - Platinum Edition",
       "installerIcon": "./src/assets/icono3.ico",
       "uninstallerIcon": "./src/assets/icono3.ico",
       "installerHeaderIcon": "./src/assets/icono3.ico"

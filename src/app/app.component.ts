@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'gestor-de-aplicaciones';
+  title = 'repo-manager';
 
   aplicaciones: Aplicacion[] = [];
   suscripcion!: Subscription;
