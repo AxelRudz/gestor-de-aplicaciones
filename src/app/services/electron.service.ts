@@ -54,7 +54,7 @@ export class ElectronService {
 
   public invoke(channel: string, ...args: any[]): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.ipc.invoke(channel, args).then((result) => {
+      this.ipc.invoke(channel, ...args).then((result) => {
         this.ngZone.run(() => {
           resolve(result);
         });

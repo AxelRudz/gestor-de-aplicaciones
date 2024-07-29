@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
 import { Subscription } from 'rxjs';
 import { AplicacionService } from '../services/aplicacion.service';
-import { Angular } from '../modelo/aplicaciones/Angular';
+import { AplicacionAngular } from '../modelo/aplicaciones/AplicacionAngular';
 
 @Component({
   selector: 'app-tabla-aplicaciones',
@@ -34,18 +34,25 @@ export class TablaAplicacionesComponent {
   }
 
   esUnaAppAngular(app: Aplicacion): boolean {
-    return app instanceof(Angular);
+    return app instanceof(AplicacionAngular);
   }
 
   estaEnEjecucion(app: Aplicacion): boolean {
-    return app.getEstado().estaEnEjecucion();
+    return app.getPidProceso() != null;
   }
 
   toggleApp(app: Aplicacion): void {
-    this.estaEnEjecucion(app)
-      ? app.detener()
-      : app.iniciar()
-    this.emitirCambioApp(app);
+    if(this.estaEnEjecucion(app)){
+      app.detener()
+        .then(ok => {          
+          this.emitirCambioApp(app);
+        })
+        .catch(error => console.error("Ocurrió un error deteniendo la app. Error: ", error));
+    }
+    else {
+      app.iniciar();
+      this.emitirCambioApp(app);
+    }    
   }
 
   moverseDeRama(app: Aplicacion, rama: string){

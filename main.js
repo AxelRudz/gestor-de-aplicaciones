@@ -2,13 +2,11 @@ const { app, BrowserWindow, dialog, ipcMain, nativeTheme } = require("electron")
 const path = require("path");
 
 // Importo otros archivos de mi app
-require("./electron/AppsAngular.js");
-require("./electron/AppsDefecto.js");
-require("./electron/AppsSpringBoot.js");
-require("./electron/git.js");
+require("./electron/App.js");
+require("./electron/Git.js");
 require("./electron/PersistenciaApps.js");
-const { gestorDeApps } = require("./electron/GestorDeApps.js");
 const { inicializarModuloTareasAutomaticas } = require("./electron/tareas-automaticas/Git.js");
+const { detenerTodasLasApps } = require("./electron/App.js");
 
 app.setAppUserModelId("REPO MANAGER - Platinum Edition")
 
@@ -30,7 +28,7 @@ function createWindow () {
   })
   nativeTheme.themeSource = "dark";
 
-  //win.webContents.openDevTools()
+  win.webContents.openDevTools()
 
   win.loadURL(`http://localhost:4000`); // <-- Usado para el hot reload
   //win.loadURL(`file://${__dirname}/dist/repo-manager/index.html`); //<-- Todavia no estan seteados los ambientes, esto se usa en produccion
@@ -54,12 +52,12 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', async () => {
   if (process.platform !== 'darwin') {
-    await gestorDeApps.detenerTodasLasApps();
+    await detenerTodasLasApps();
     app.quit()
   }
 })
 
-ipcMain.handle('seleccionar-directorio', async (event) => {
+ipcMain.handle('seleccionar-directorio', (event) => {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await dialog.showOpenDialog(win, {
@@ -70,7 +68,11 @@ ipcMain.handle('seleccionar-directorio', async (event) => {
         const filePath = result.filePaths[0];
         resolve(filePath)
       }
-    } catch (err) {
+      else {
+        resolve(null);
+      }
+    } catch (error) {
+      console.error("Ocurrió un error al seleccionar el directorio. Error: ", error);
       resolve(null)
     }
   });

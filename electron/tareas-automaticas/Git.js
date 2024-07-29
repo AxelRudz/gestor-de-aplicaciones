@@ -12,7 +12,7 @@
 // Abajo hay codigo de como uso comandos git, notificaciones, etc...
 const { Notification, app } = require("electron");
 const { exec } = require("child_process");
-const { recuperarAppsGuardadas } = require("../PersistenciaApps.js");
+const { getCacheAplicacionesGuardadas } = require("../PersistenciaApps.js");
 const fs = require("fs");
 const util = require("util");
 const path = require("path");
@@ -26,16 +26,10 @@ const inicializarModuloTareasAutomaticas = () => {
 }
 
 function verificarCommitsRemotosRepos(){
-  recuperarAppsGuardadas()
-  .then(lineasApps => {
-    const rutas = lineasApps.map(lineaApp => {
-      const [tipo, nombre, puerto, ruta] = lineaApp.split("|||");
-      return ruta;
-    });
-    guardarCommitsRemotosDeAplicaciones(rutas)
-      .catch(error => console.error(error))
-  })
-  .catch(error => console.error(error));
+  // getCacheAplicacionesGuardadas(): Aplicacion[] -> Definido en el modelo
+  const rutasRepos = getCacheAplicacionesGuardadas().map(aplicacion => aplicacion.ruta);
+  guardarCommitsRemotosDeAplicaciones(rutasRepos)
+    .catch(error => console.error(error))
 }
 
 async function guardarCommitsRemotosDeAplicaciones(rutas){

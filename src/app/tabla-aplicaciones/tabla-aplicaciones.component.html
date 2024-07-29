@@ -21,12 +21,12 @@
       </td>
       <td>{{app.getPuerto()}}</td>
       <td>
-        <div *ngIf="!hayMuchasRamas(app)" class="td-rama d-inline-block" [class.text-warning]="app.getGit().getRamaDesactualizada()">
+        <div *ngIf="!hayMuchasRamas(app)" class="td-rama d-inline-block" [class.text-warning]="!app.getGit().getRamaActualizada()">
           <i class="fa-solid fa-code-branch me-2"></i>
           {{app.getGit().getRamaActual()}}
         </div>
         <div *ngIf="hayMuchasRamas(app)" class="dropdown td-rama d-inline-block">
-          <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" [class.text-warning]="app.getGit().getRamaDesactualizada()">
+          <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" [class.text-warning]="!app.getGit().getRamaActualizada()">
             <i class="fa-solid fa-code-branch me-2"></i>
             {{app.getGit().getRamaActual()}}
           </div>
@@ -42,7 +42,7 @@
           </ul>
         </div>
         <div
-          *ngIf="app.getGit().getRamaDesactualizada()"
+          *ngIf="!app.getGit().getRamaActualizada()"
           class="git-pull-link"
           (click)="gitPull(app)"
         >

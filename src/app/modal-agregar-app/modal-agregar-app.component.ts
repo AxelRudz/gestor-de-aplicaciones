@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Component, ElementRef, Renderer2, ViewChild } from '
 import { FormBuilder, Validators } from '@angular/forms';
 import { ElectronService } from '../services/electron.service';
 import { AplicacionService } from '../services/aplicacion.service';
-import { Angular } from '../modelo/aplicaciones/Angular';
-import { SpringBoot } from '../modelo/aplicaciones/SpringBoot';
+import { AplicacionAngular } from '../modelo/aplicaciones/AplicacionAngular';
+import { AplicacionSpringBoot } from '../modelo/aplicaciones/AplicacionSpringBoot';
 
 @Component({
   selector: 'app-modal-agregar-app',
@@ -52,8 +52,8 @@ export class ModalAgregarAppComponent {
       const ruta = f.get('ruta')!.value!;
 
       const app = tipo == "Angular"
-        ? new Angular(nombre, Number.parseInt(puerto), ruta, this.electronService, this.aplicacionService)
-        : new SpringBoot(nombre, Number.parseInt(puerto), ruta, this.electronService, this.aplicacionService)
+        ? new AplicacionAngular(nombre, Number.parseInt(puerto), ruta, this.electronService, this.aplicacionService)
+        : new AplicacionSpringBoot(nombre, Number.parseInt(puerto), ruta, this.electronService, this.aplicacionService)
       
       if(this.aplicacionService.agregarAplicacion(app)){
         this.formularioAgregarAplicacion.reset({tipo: "Angular"})

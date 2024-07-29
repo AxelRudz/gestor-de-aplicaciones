@@ -7,9 +7,8 @@ export class Git {
   private puerto: number;
   private ramaActual: string;
   private ramasDisponibles: string[];
-  private ramaDesactualizada: boolean;
-  private electronService: ElectronService;
-  private intervaloTareasPeriodicas: any;
+  private ramaActualizada: boolean;
+  private electronService: ElectronService;  
   private terminal: Terminal;
 
   constructor(rutaRepo: string, puerto: number, electronService: ElectronService, terminal: Terminal){
@@ -17,51 +16,26 @@ export class Git {
     this.puerto = puerto;
     this.ramaActual = "";
     this.ramasDisponibles = [];
-    this.ramaDesactualizada = false;
+    this.ramaActualizada = true;
     this.electronService = electronService;  
     this.terminal = terminal;
-    this.observarRamaGit();
-    this.intervaloTareasPeriodicas = setInterval(this.tareasPeriodicas, 5000);
-  }
-
-  getRutaRepo(): string {
-    return this.rutaRepo;
-  }
-
-  setRutaRepo(ruta: string): void {
-    this.rutaRepo = ruta;
+    this.iniciarTareasAutomaticas();
   }
 
   getRamaActual(): string {
     return this.ramaActual;
   }
 
-  setRamaActual(ramaActual: string): void {
-    this.ramaActual = ramaActual;
-  }
-
   getRamasDisponibles(): string[] {
     return this.ramasDisponibles;
   }
 
-  setRamasDisponibles(ramasDisponibles: string[]): void {
-    this.ramasDisponibles = ramasDisponibles;
-  }
-
-  getRamaDesactualizada(): boolean {
-    return this.ramaDesactualizada;
-  }
-
-  setRamaDesactualizada(ramaDesactualizada: boolean): void {
-    this.ramaDesactualizada = ramaDesactualizada;
+  getRamaActualizada(): boolean {
+    return this.ramaActualizada;
   }
 
   gitCheckout(rama: string): void {
-    const body = {
-      rutaRepo: this.rutaRepo,
-      rama: rama
-    }
-    this.electronService.invoke("git-checkout", body)
+    this.electronService.invoke("git-checkout", this.rutaRepo, rama)
       .then((response: {ok: boolean, mensajes: string[]}) => {
         if(response.ok){
           this.ramaActual = rama;
@@ -72,51 +46,50 @@ export class Git {
       });
   };
 
-  observarRamaGit(): void {
-    const puerto = this.puerto;
-    const ruta = this.rutaRepo;    
-    this.electronService.send("observar-rama-git", {puerto, ruta})
-    this.electronService.on(`respuesta-observar-rama-git-${puerto}`, (event: any, response: {ruta: string, nombre: string}) => {  
-      this.setRamaActual(response.nombre);
-    });
-  }
-
-  removeListeners(): void {
-    this.electronService.removeAllListeners(`respuesta-observar-rama-git-${this.puerto}`)
-  }
-
-  tareasPeriodicas = () => {
-    this.consultarRamas();
-    this.verificarSiLaRamaActualEstaDesactualizada();
-  }
-
-  consultarRamas(): void {
-    const rutaRepo = this.rutaRepo;
-    this.electronService.invoke("consultar-ramas-git", rutaRepo)
-      .then((ramas: string[]) => {
-        this.ramasDisponibles = ramas;
-      });
-  }
-
-  verificarSiLaRamaActualEstaDesactualizada(): void {
-    const rutaRepo = this.rutaRepo;
-    this.electronService.invoke("consultar-rama-desactualizada", rutaRepo)
-      .then((estaDesactualizada: boolean) => {
-        this.ramaDesactualizada = estaDesactualizada;
-      });
-  }
-
-  gitPull(): void {
-    const rutaRepo = this.rutaRepo;
-    this.electronService.invoke("git-pull", rutaRepo)
+  gitPull(): void {    
+    this.electronService.invoke("git-pull", this.rutaRepo)
       .then((response: {ok: boolean, mensajes: string[]}) => {
         if(response.ok){
-          this.ramaDesactualizada = false;
+          this.ramaActualizada = true;
         }
         response.mensajes.forEach(mensaje => {
           this.terminal.agregarMensaje(mensaje);
         })
       });
+  }
+
+  escucharCambiosRamaActual(): void {
+    this.electronService.send("rama-actual", this.rutaRepo, this.puerto);
+    this.electronService.on(`rama-actual-${this.puerto}`, (event: any, nombre: string) => {        
+      this.ramaActual = nombre;
+    });
+  }
+
+  consultarRamasDisponibles(): Promise<any> {
+    return this.electronService.invoke("ramas-disponibles", this.rutaRepo)
+      .then((ramasDisponibles: string[]) => {
+        this.ramasDisponibles = ramasDisponibles;
+      });
+  }
+
+  consultarRamaActualizada(): Promise<any> {
+    return this.electronService.invoke("rama-actualizada", this.rutaRepo)
+      .then((ramaActualizada: boolean) => {
+        this.ramaActualizada = ramaActualizada;
+      });
+  }
+
+  removeListeners(): void {
+    this.electronService.removeAllListeners(`rama-actual-${this.puerto}`);
+  }
+
+  async iniciarTareasAutomaticas(): Promise<void> {
+    this.escucharCambiosRamaActual();
+    while (true) {
+      await this.consultarRamasDisponibles();
+      await this.consultarRamaActualizada();
+      await new Promise(resolve => setTimeout(resolve, 10000));
+    }
   }
 
 }

@@ -27,7 +27,7 @@ export class AppComponent {
   }
 
   estanTodasLasAplicacionesCorriendo(): boolean {
-    return this.aplicaciones.every(aplicacion => aplicacion.getEstado().estaEnEjecucion());
+    return this.aplicaciones.every(aplicacion => aplicacion.getPidProceso());
   }
 
   iniciarTodasLasAplicaciones(): void {

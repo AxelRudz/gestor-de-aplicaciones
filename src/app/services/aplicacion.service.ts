@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
-import { Angular } from '../modelo/aplicaciones/Angular';
+import { AplicacionAngular } from '../modelo/aplicaciones/AplicacionAngular';
 import { ElectronService } from './electron.service';
-import { SpringBoot } from '../modelo/aplicaciones/SpringBoot';
+import { AplicacionSpringBoot } from '../modelo/aplicaciones/AplicacionSpringBoot';
+import { AplicacionPersistenciaDTO, TipoAplicacion } from '../modelo/aplicaciones/AplicacionPersistenciaDTO';
+import { AplicacionOtra } from '../modelo/aplicaciones/AplicacionOtra';
 
 @Injectable({
   providedIn: 'root'
@@ -22,21 +24,20 @@ export class AplicacionService {
   }
 
   recuperarAplicacionesGuardadas(){
-    this.electronService.invoke('recuperar-aplicaciones-guardadas')
-      .then((apps: string[]) => {
+    this.electronService.invoke('persistencia-recuperar-aplicaciones-guardadas')
+      .then((aplicacionesGuardadas: AplicacionPersistenciaDTO[]) => {
         const listadoGeneradoDeApps: Aplicacion[] = [];
-        apps.forEach(app => {
-          const atributos = app.split("|||");
-          const tipo = atributos[0];
-          const nombre = atributos[1];
-          const puerto = atributos[2];
-          const ruta = atributos[3];
-
-          if(tipo == "Angular"){
-            listadoGeneradoDeApps.push(new Angular(nombre, parseInt(puerto), ruta, this.electronService, this))
-          }
-          if(tipo == "Spring-Boot"){
-            listadoGeneradoDeApps.push(new SpringBoot(nombre, parseInt(puerto), ruta, this.electronService, this))
+        aplicacionesGuardadas.forEach(app => {
+          switch(app.tipo){
+            case TipoAplicacion.Angular:
+              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, this.electronService, this))
+              break;
+            case TipoAplicacion.SpringBoot:
+              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, this.electronService, this))
+              break;
+            case TipoAplicacion.Otra:
+              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, this.electronService, this))
+              break;
           }
         });
         this.aplicaciones = listadoGeneradoDeApps;
@@ -47,28 +48,22 @@ export class AplicacionService {
       })
   }
 
-  persistenciaAgregarAplicacion(app: Aplicacion){
-    let tipo;
-    if(app instanceof Angular){
-      tipo = "Angular"
+  persistenciaAgregarAplicacion(aplicacion: Aplicacion){
+    const aplicacionParaAgregar: AplicacionPersistenciaDTO = {
+      tipo: aplicacion.getTipoAplicacion(),
+      nombre: aplicacion.getNombre(),
+      ruta: aplicacion.getRuta(),
+      puerto: aplicacion.getPuerto(),
+      comandoIniciar: aplicacion.getComandoIniciar()
     }
-    if(app instanceof SpringBoot){
-      tipo = "Spring-Boot"
-    }
-    if(!tipo){
-      return;
-    }
-    const linea = `${tipo}|||${app.getNombre()}|||${app.getPuerto()}|||${app.getRuta()}`
-    
-    this.electronService.invoke('persistencia-agregar-aplicacion', linea)
+    this.electronService.invoke('persistencia-agregar-aplicacion', aplicacionParaAgregar)
       .catch(error => {
         console.error(error);
       })
   }
 
-  persistenciaEliminarAplicacion(nroPuerto: number){
-    const puerto = nroPuerto.toString();
-    this.electronService.invoke('persistencia-eliminar-aplicacion', puerto)
+  persistenciaEliminarAplicacion(aplicacion: Aplicacion): Promise<any>{
+    return this.electronService.invoke('persistencia-eliminar-aplicacion', aplicacion.getPuerto(), aplicacion.getPidProceso())
       .catch(error => {
         console.error(error);
       })
@@ -84,24 +79,26 @@ export class AplicacionService {
     return true;
   }
 
-  eliminarAplicacion(puerto: number){
-    this.persistenciaEliminarAplicacion(puerto);
-    this.aplicaciones = this.aplicaciones.filter(appAgregada => appAgregada.getPuerto() != puerto);
-    this.aplicacionesSubject.next(this.aplicaciones);
+  eliminarAplicacion(aplicacion: Aplicacion){
+    this.persistenciaEliminarAplicacion(aplicacion)
+    .then( _ => {
+      this.aplicaciones = this.aplicaciones.filter(aplicacionAgregada => aplicacionAgregada.getPuerto() != aplicacion.getPuerto());
+      this.aplicacionesSubject.next(this.aplicaciones);
+    })
   }
 
   iniciarTodasLasAplicaciones(): void {
     this.aplicaciones.forEach(aplicacion => {
-      if(aplicacion.getEstado().estaEnEjecucion() == false){
+      if(!aplicacion.getPidProceso()){
         aplicacion.iniciar();
       }
     })
   }
 
   detenerTodasLasAplicaciones(): void {
-    this.aplicaciones.forEach(aplicacion => {
-      if(aplicacion.getEstado().estaEnEjecucion() == true){
-        aplicacion.detener();
+    this.aplicaciones.forEach(async aplicacion => {
+      if(aplicacion.getPidProceso()){
+        await aplicacion.detener();
       }
     })
   }

@@ -1,88 +1,88 @@
 const { app, ipcMain } = require('electron');
 const fs = require("fs");
+const { matarProceso } = require('./App')
 
-ipcMain.handle('recuperar-aplicaciones-guardadas', async (event) => {
-  return recuperarAppsGuardadas();
+
+let cacheAplicacionesGuardadas = [];
+
+ipcMain.handle('persistencia-recuperar-aplicaciones-guardadas', (event) => {
+  return getAplicacionesGuardadas();
 });
 
-ipcMain.handle('persistencia-agregar-aplicacion', async (event, linea) => {
-  return new Promise(async (resolve, reject) => {
-    const path = app.getPath('userData');
-    const filePath = `${path}/ListadoAplicacionesGuardadas`;
+// Formato (event: any, aplicacion: Aplicacion)
+ipcMain.handle('persistencia-agregar-aplicacion', (event, aplicacion) => {
+  return new Promise((resolve, reject) => {
     try {
-      // Leer el archivo para asegurarse de que existe
-      await fs.promises.readFile(filePath, 'utf-8');
-      // Agregar la nueva línea al final del archivo
-      await fs.promises.appendFile(filePath, `\n${linea}`);
+      const aplicacionesGuardadas = getCacheAplicacionesGuardadas();      
+      aplicacionesGuardadas.push(aplicacion);
+      setAplicacionesGuardadas(aplicacionesGuardadas)
+      resolve(true);
+    }
+    catch(error){
+      reject(error);
+    }
+  });
+});
+
+ipcMain.handle('persistencia-eliminar-aplicacion', async (event, puerto, pid) => {
+  return new Promise(async (resolve, reject) => {
+    if(pid){
+      await matarProceso(pid)
+      .catch(error => {
+        console.error("Error deteniendo la aplicación. Error: ", error);
+        reject("Error deteniendo la aplicación.")
+      });
+    }
+    try {
+      const listadoAplicaciones = getCacheAplicacionesGuardadas();
+      const indexApp = listadoAplicaciones.findIndex(aplicacion => aplicacion.puerto == puerto);
+      if(indexApp != -1){        
+        listadoAplicaciones.splice(indexApp, 1);
+      }
+      setAplicacionesGuardadas(listadoAplicaciones);
       resolve(true)
     }
     catch(error){
-      // Si el archivo no existe, crearlo y agregar la línea
-      if (error.code === 'ENOENT') {
-        try {
-          await fs.promises.writeFile(filePath, linea);
-          resolve(true);
-        } catch (writeError) {
-          reject(writeError);
-        }
-      } else {
-        reject(error);
-      }
+      console.error("Ocurrió un error obteniendo el listado de aplicaciones guardadas. Error: ", error);
+      resolve(false)
     }
   });
 });
 
-ipcMain.handle('persistencia-eliminar-aplicacion', async (event, puerto) => {
-  return new Promise(async (resolve, reject) => {
-    const path = app.getPath('userData');
-    const filePath = `${path}/ListadoAplicacionesGuardadas`;
-    try {
-      // Leer el archivo para obtener todas las líneas. Elimino las lineas en blanco
-      const data = await fs.promises.readFile(filePath, 'utf-8');
-      const lineasArchivo = data.split('\n').filter(linea => linea);
-
-      // Filtrar las líneas para eliminar la que contiene el puerto
-      const lineasFiltradas = lineasArchivo.filter(linea => linea.split("|||")[2] != puerto);
-
-      // Sobrescribir el archivo con las líneas restantes
-      await fs.promises.writeFile(filePath, lineasFiltradas.join('\n'));
-
-      resolve(true);
-    } catch (error) {
-      // Si el archivo no existe, resolver con true porque no hay nada que borrar
-      if (error.code === 'ENOENT') {
-        resolve(true);
-      } else {
-        reject(error);
-      }
+const getAplicacionesGuardadas = () => {
+  const path = app.getPath('userData');
+  const filePath = `${path}/ListadoAplicacionesGuardadas`;
+  try {
+    if(!fs.existsSync(filePath)){
+      fs.writeFileSync(filePath, "[]" ,"utf-8");
     }
-  });
-});
+    const listadoAplicacionesGuardadas = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    cacheAplicacionesGuardadas = listadoAplicacionesGuardadas;
+    return listadoAplicacionesGuardadas;
+  }
+  catch(error){
+    console.error("Ocurrió un error obteniendo el listado de aplicaciones guardadas. Error: ", error);
+    throw error;
+  }
+}
 
-const recuperarAppsGuardadas = () => {
-  return new Promise((resolve, reject) => {
-    const path = app.getPath('userData');
-    try {
-      const buf = fs.readFileSync(`${path}/ListadoAplicacionesGuardadas`, 'utf-8');
-      const apps = buf.split('\n').filter(linea => linea);
-      resolve(apps)
-    }
-    catch(error){
-      // Si el error es porque no existe ese archivo, lo creo
-      if(error.code = 'ENOENT'){
-        try {
-          // Abro y cierro el archivo para crearlo
-          fs.closeSync(fs.openSync(`${path}/ListadoAplicacionesGuardadas`, "w"));
-          resolve([]);
-        } catch (writeError) {
-          reject(writeError);
-        }
-      }
-      reject(error.message);
-    }
-  });
+const setAplicacionesGuardadas = (listado) => {
+  const path = app.getPath('userData');
+  const filePath = `${path}/ListadoAplicacionesGuardadas`;
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(listado, null, 4), 'utf-8');
+    cacheAplicacionesGuardadas = listado;
+  }
+  catch(error){
+    console.error("Ocurrió un error escribiendo el archivo de aplicaciones guardadas. Error: ", error);
+    throw error;
+  }
+}
+
+const getCacheAplicacionesGuardadas = () => {
+  return cacheAplicacionesGuardadas
 }
 
 module.exports = {
-  recuperarAppsGuardadas
+  getCacheAplicacionesGuardadas
 }
