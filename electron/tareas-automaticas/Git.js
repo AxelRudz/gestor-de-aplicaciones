@@ -20,9 +20,32 @@ const { rejects } = require("assert");
 const { shell } = require("electron");
 const execPromise = util.promisify(exec);
 
+const userDataPath = app.getPath('userData');
+const filePath = path.join(userDataPath, "Registro de commits");
+const fechaHoy = new Date().toISOString().split("T")[0];
+const archivoRegistroCommitsPath = path.join(filePath, fechaHoy);
 
 const inicializarModuloTareasAutomaticas = () => {
+  validarArchivoControlCommits();
   setInterval(() => verificarCommitsRemotosRepos(), 5000);
+}
+
+const validarArchivoControlCommits = () => {
+  // Me fijo que exista la carpeta 'Registro de commits, sino la creo
+  if(!fs.existsSync(filePath)){    
+    fs.mkdirSync(filePath);
+  }
+  // Borro todos los archivos que no sean del dia actual
+  const archivos = fs.readdirSync(filePath);
+  archivos.forEach(nombreArchivo => {
+    if(nombreArchivo != fechaHoy){
+      fs.promises.rm(path.join(filePath, nombreArchivo));
+    }
+  })
+  // Si no existe el archivo con el dia actual, lo creo
+  if(!fs.existsSync(archivoRegistroCommitsPath)){
+    fs.writeFileSync(archivoRegistroCommitsPath, "", "utf-8");
+  }
 }
 
 function verificarCommitsRemotosRepos(){
@@ -75,53 +98,33 @@ async function promesaListadoCommits(ruta) {
 
 // infoRepos es de tipo {ruta: string, commits: string[]}[]
 function guardarCommitsEnArchivoDeControl(infoRepos){  
-  return new Promise(() => {
-    const path = app.getPath('userData');
-    const fechaHoy = new Date().toISOString().split("T")[0];
-    const filePath = `${path}/Registro commits ${fechaHoy}`;
+  return new Promise((resolve, reject) => {
     try {
       // De tipo {ruta, commit}[]
-      const notificacionesParaEnviar = [];
-      // Leer el archivo para asegurarse de que existe
-      const archivo = fs.readFileSync(filePath, 'utf-8');
+      const notificacionesParaEnviar = [];  
+      const commitsRegistrados = fs.readFileSync(archivoRegistroCommitsPath, 'utf-8').split("\n");
       // Agregar la nueva línea al final del archivo
       infoRepos.forEach(repo => {
         repo.commits.forEach(commit => {
-          if(!archivo.includes(commit)){
-            fs.appendFileSync(filePath, `\n${commit}`);
-            const ruta = repo.ruta;
-            notificacionesParaEnviar.push({ruta, commit});
+          if(!commitsRegistrados.includes(commit)){
+            commitsRegistrados.push(commit);          
+            notificacionesParaEnviar.push({ruta: repo.ruta, commit});
           }
         })
-      })      
-      if(notificacionesParaEnviar.length <= 5){
-        notificacionesParaEnviar.forEach(rutaCommit => {
-          const ruta = rutaCommit.ruta;
-          const [hash, autor, nombreCommit] = rutaCommit.commit.split("|");
+      })    
+      fs.writeFileSync(archivoRegistroCommitsPath, commitsRegistrados.join("\n"));
+      // Para no spamear, en el peor de los casos solo muestro las ultimas 5 notificaciones
+      if(notificacionesParaEnviar.length > 0){
+        notificacionesParaEnviar.slice(-5).forEach(rutaYCommit => {
+          const ruta = rutaYCommit.ruta;
+          const [hash, autor, nombreCommit] = rutaYCommit.commit.split("|");
           mostrarNotificacion(ruta, hash, autor, nombreCommit);
         })
       }
-      resolve(true)
+      resolve(true);
     }
     catch(error){
-      // Si el archivo no existe, crearlo y agregar la línea
-      if (error.code === 'ENOENT') {
-        try {
-          const listadoCommits = [];
-          infoRepos.forEach(repo => {
-            repo.commits.forEach(commit => {
-              if(!listadoCommits.includes(commit)){
-                listadoCommits.push(commit);
-              }
-            })
-          })
-          fs.writeFileSync(filePath, listadoCommits.join("\n"));
-          resolve(true);
-        } catch (writeError) {
-          rejects(new Promise(()=>{resolve (writeError)}));
-        }
-      } 
-      rejects(new Promise(()=>{resolve (false)}));
+      reject("Ocurrio un error guardando cambios en el archivo de control de git. Error: ", error);
     }
   })
 }
