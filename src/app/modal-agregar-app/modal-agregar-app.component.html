@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="modalAgregarApp" tabindex="-1" aria-labelledby="modalAgregarAppLabel" aria-hidden="true">
+<div class="modal modal-lg fade" id="modalAgregarApp" tabindex="-1" aria-labelledby="modalAgregarAppLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -8,26 +8,60 @@
       </div>
       <form [formGroup]="formularioAgregarAplicacion" class="modal-body">
 
-        <label for="tipoApp" class="form-label mt-2">Tipo de aplicación</label>
+        <label for="tipoApp" class="form-label mt-2">
+          Tipo de aplicación <span class="text-danger">*</span>
+        </label>
         <select id="tipoApp" class="form-select mt-1" formControlName="tipo">
-          <option>Angular</option>
-          <option>Spring-Boot</option>
+          <option value="">Seleccione un tipo de aplicación</option>
+          <option>{{TipoAplicacion.Angular}}</option>
+          <option>{{TipoAplicacion.SpringBoot}}</option>
+          <option>{{TipoAplicacion.Otra}}</option>
         </select>
 
-        <label for="nombreApp" class="form-label mt-3">Nombre</label>
+        <label for="nombreApp" class="form-label mt-3">
+          Nombre <span class="text-danger">*</span>
+        </label>
         <input id="nombreApp" class="form-control" type="text" placeholder="Nombre..." formControlName="nombre">
 
-        <label for="puertoApp" class="form-label mt-3">Puerto</label>
+        <label for="puertoApp" class="form-label mt-3">
+          Puerto <span class="text-danger">*</span>
+        </label>
         <input id="puertoApp" class="form-control" type="text" placeholder="Número de puerto..." formControlName="puerto">
 
-        <div class="d-flex align-items-center">
-          <button class="btn btn-primary mt-3 me-2" (click)="abrirDialogRuta()">
-            <i class="fa-solid fa-folder-open"></i>
-            Seleccionar carpeta raíz
-          </button>        
-          {{formularioAgregarAplicacion.get('ruta')?.value}}
+        <label for="comandoArranque" class="form-label mt-3">
+          Comando para iniciar la aplicación
+          <span class="text-danger">*</span>
+          <span class="text-muted ms-1">(Se ejecutará en el directorio raíz seleccionado)</span>
+        </label>
+        <div class="d-flex justify-content-center align-content-stretch">
+          <textarea
+            id="comandoArranque"
+            class="form-control"
+            type="text"
+            placeholder="Comando..."
+            formControlName="comandoDeArranque"
+            style="border-radius: 5px 0 0 5px;"
+          ></textarea>
+          <button
+            (click)="toggleDisabledCampoComandoDeArranque()"
+            class="btn btn-secondary"
+            style="border-radius: 0 5px 5px 0;">
+            <i class="fas fa-pencil"></i>
+          </button>
         </div>
-        
+
+        <label for="puertoApp" class="form-label mt-3">
+          Directorio raíz de la aplicación <span class="text-danger">*</span>
+        </label>
+        <div class="d-flex align-items-center">
+          <button class="btn btn-primary me-2" (click)="abrirDialogRuta()">
+            <i class="fa-solid fa-folder-open me-1"></i>
+            Seleccionar
+          </button>        
+          <span class="text-muted" style="cursor: default;">
+            {{campoRuta.value}}
+          </span>
+        </div>        
 
       </form>
       <div class="modal-footer">

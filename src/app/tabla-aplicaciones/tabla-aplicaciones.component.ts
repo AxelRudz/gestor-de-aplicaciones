@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
+import { Aplicacion } from '../modelo/aplicaciones/tipos/Aplicacion';
 import { Subscription } from 'rxjs';
 import { AplicacionService } from '../services/aplicacion.service';
-import { AplicacionAngular } from '../modelo/aplicaciones/AplicacionAngular';
+import { AplicacionAngular } from '../modelo/aplicaciones/tipos/AplicacionAngular';
 
 @Component({
   selector: 'app-tabla-aplicaciones',

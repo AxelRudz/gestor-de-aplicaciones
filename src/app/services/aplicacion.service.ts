@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
-import { AplicacionAngular } from '../modelo/aplicaciones/AplicacionAngular';
+import { Aplicacion } from '../modelo/aplicaciones/tipos/Aplicacion';
+import { AplicacionAngular } from '../modelo/aplicaciones/tipos/AplicacionAngular';
 import { ElectronService } from './electron.service';
-import { AplicacionSpringBoot } from '../modelo/aplicaciones/AplicacionSpringBoot';
-import { AplicacionPersistenciaDTO, TipoAplicacion } from '../modelo/aplicaciones/AplicacionPersistenciaDTO';
-import { AplicacionOtra } from '../modelo/aplicaciones/AplicacionOtra';
+import { AplicacionSpringBoot } from '../modelo/aplicaciones/tipos/AplicacionSpringBoot';
+import { AplicacionElectronDTO } from '../modelo/aplicaciones/AplicacionElectronDTO';
+import { TipoAplicacion } from '../modelo/aplicaciones/enums/TipoAplicacion';
+import { AplicacionOtra } from '../modelo/aplicaciones/tipos/AplicacionOtra';
 
 @Injectable({
   providedIn: 'root'
@@ -25,18 +26,18 @@ export class AplicacionService {
 
   recuperarAplicacionesGuardadas(){
     this.electronService.invoke('persistencia-recuperar-aplicaciones-guardadas')
-      .then((aplicacionesGuardadas: AplicacionPersistenciaDTO[]) => {
+      .then((aplicacionesGuardadas: AplicacionElectronDTO[]) => {
         const listadoGeneradoDeApps: Aplicacion[] = [];
         aplicacionesGuardadas.forEach(app => {
           switch(app.tipo){
             case TipoAplicacion.Angular:
-              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, app.comandoDeArranque, this.electronService, this))
               break;
             case TipoAplicacion.SpringBoot:
-              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, app.comandoDeArranque, this.electronService, this))
               break;
             case TipoAplicacion.Otra:
-              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, app.comandoDeArranque, this.electronService, this))
               break;
           }
         });
@@ -49,12 +50,12 @@ export class AplicacionService {
   }
 
   persistenciaAgregarAplicacion(aplicacion: Aplicacion){
-    const aplicacionParaAgregar: AplicacionPersistenciaDTO = {
+    const aplicacionParaAgregar: AplicacionElectronDTO = {
       tipo: aplicacion.getTipoAplicacion(),
       nombre: aplicacion.getNombre(),
       ruta: aplicacion.getRuta(),
       puerto: aplicacion.getPuerto(),
-      comandoIniciar: aplicacion.getComandoIniciar()
+      comandoDeArranque: aplicacion.getComandoDeArranque()
     }
     this.electronService.invoke('persistencia-agregar-aplicacion', aplicacionParaAgregar)
       .catch(error => {

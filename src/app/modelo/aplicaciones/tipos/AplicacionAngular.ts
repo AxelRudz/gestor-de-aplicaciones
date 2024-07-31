@@ -1,15 +1,15 @@
 import { Aplicacion } from "./Aplicacion";
-import { TipoAplicacion } from "./AplicacionPersistenciaDTO";
+import { TipoAplicacion } from "src/app/modelo/aplicaciones/enums/TipoAplicacion";
 
 export class AplicacionAngular extends Aplicacion {
+
+  static getComandoDeArranquePorDefecto(puerto: string): string {
+    return `ng serve -o --port ${puerto}`
+  }
 
   override getLogoUrl(): string {
     return "./assets/logo-angular.png";
   }
-
-  override getComandoIniciar(): string {
-    return `ng serve -o --port ${this.getPuerto()}`;
-  }  
 
   override getTipoAplicacion(): TipoAplicacion {
     return TipoAplicacion.Angular

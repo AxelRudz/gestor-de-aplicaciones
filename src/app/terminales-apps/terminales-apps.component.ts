@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { AplicacionService } from '../services/aplicacion.service';
-import { Aplicacion } from '../modelo/aplicaciones/Aplicacion';
+import { Aplicacion } from '../modelo/aplicaciones/tipos/Aplicacion';
 
 @Component({
   selector: 'app-terminales-apps',

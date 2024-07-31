@@ -1,15 +1,18 @@
-import { Git } from "./Git";
-import { Terminal } from "./Terminal";
+import { Git } from "../Git";
+import { Terminal } from "../Terminal";
 import { ElectronService } from "src/app/services/electron.service";
 import { AplicacionService } from "src/app/services/aplicacion.service";
-import { TipoAplicacion } from "./AplicacionPersistenciaDTO";
+import { TipoAplicacion } from "src/app/modelo/aplicaciones/enums/TipoAplicacion";
 
+
+// Nota: Las clases que heredan de Aplicacion deben implementar un metodo statico donde
+// devuelven el comando de arranque por defecto para iniciar la aplicacion de su clase
 export abstract class Aplicacion {
 
   private nombre: string;
   private puerto: number;
   private ruta: string;
-  private comandoIniciar: string;
+  private comandoDeArranque: string;
   private git: Git;
   private terminal: Terminal;
   private pidProceso: number | null;
@@ -20,6 +23,7 @@ export abstract class Aplicacion {
     nombre: string,
     puerto: number,
     ruta: string,
+    comandoDeArranque: string,
     electronService: ElectronService,
     aplicacionService: AplicacionService,
   ){
@@ -27,7 +31,7 @@ export abstract class Aplicacion {
     this.puerto = puerto;
     this.ruta = ruta;
     // La clase hija tendrá definido un comando para iniciar la app
-    this.comandoIniciar = this.getComandoIniciar();
+    this.comandoDeArranque = comandoDeArranque;
     this.pidProceso = null;
     this.terminal = new Terminal();    
     this.git = new Git(ruta, puerto, electronService, this.terminal);
@@ -35,13 +39,12 @@ export abstract class Aplicacion {
     this.aplicacionService = aplicacionService;
   }
   
-  abstract getLogoUrl(): string;
-  abstract getComandoIniciar(): string;
   abstract getTipoAplicacion(): TipoAplicacion;
+  abstract getLogoUrl(): string;
 
   iniciar(): void {
     this.terminal.setMensajes([`Iniciando aplicación...`])
-    this.electronService.send("iniciar-aplicacion", this.puerto, this.ruta, this.comandoIniciar);
+    this.electronService.send("iniciar-aplicacion", this.puerto, this.ruta, this.comandoDeArranque);
     this.electronService.on(`iniciar-aplicacion-${this.puerto}`, (event: any, pid: number | null, mensaje: string) => {
       this.pidProceso = pid;
       this.terminal.agregarMensaje(mensaje)
@@ -112,8 +115,12 @@ export abstract class Aplicacion {
     return this.terminal;
   }
 
-  setComandoIniciar(comandoIniciar: string): void {
-    this.comandoIniciar = comandoIniciar;
+  getComandoDeArranque(): string {
+    return this.comandoDeArranque;
+  }
+
+  setComandoDeArranque(comandoDeArranque: string): void {
+    this.comandoDeArranque = comandoDeArranque;
   }
 
 

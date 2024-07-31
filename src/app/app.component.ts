@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Aplicacion } from './modelo/aplicaciones/Aplicacion';
+import { Aplicacion } from './modelo/aplicaciones/tipos/Aplicacion';
 import { AplicacionService } from './services/aplicacion.service';
 import { Subscription } from 'rxjs';
 
