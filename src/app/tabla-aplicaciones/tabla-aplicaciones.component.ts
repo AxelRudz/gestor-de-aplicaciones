@@ -66,4 +66,8 @@ export class TablaAplicacionesComponent {
     this.seInteractuoConUnaApp.emit(app);
   }
 
+  alMenosUnaAplicacionTieneTrello(): boolean {
+    return this.aplicaciones.some(app => app.getUrlTableroTrello());
+  }
+
 }
