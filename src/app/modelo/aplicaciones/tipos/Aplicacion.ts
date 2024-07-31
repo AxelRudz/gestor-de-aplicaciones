@@ -84,14 +84,24 @@ export abstract class Aplicacion {
   abrirEnIDE(): void {
     this.terminal.agregarMensaje(`Abriendo ${this.nombre} en Visual Studio Code...`);
     this.electronService.invoke("abrir-aplicacion-en-visual-studio", this.ruta)
+    .then( ok => {
+      if(ok){
+        this.terminal.agregarMensaje("Acción finalizada.");
+      }
+    })
     .catch(error => {
       console.error("Ocurrió un error abriendo la app en Visual Studio Code. Error: ", error)
     });
   }
 
   abrirTableroDeTrello(): void {
-    this.terminal.agregarMensaje(`Abriendo tablero de ${this.nombre} en Trello...`);
+    this.terminal.agregarMensaje(`Abriendo tablero de ${this.nombre} en el navegador...`);
     this.electronService.invoke("abrir-tablero-de-trello", this.urlTableroTrello)
+    .then( ok => {
+      if(ok){
+        this.terminal.agregarMensaje("Acción finalizada.");
+      }
+    })
     .catch(error => {
       console.error("Ocurrió un error abriendo la app en Visual Studio Code. Error: ", error)
     });
