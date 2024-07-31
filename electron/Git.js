@@ -1,36 +1,96 @@
 const { ipcMain } = require('electron');
+const util = require("util");
 const { exec } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const execPromise = util.promisify(exec);
 
-ipcMain.on('rama-actual', (event, ruta, puerto) => {
-  // Devuelvo el nombre de la rama actual...y luego empiezo a escuchar cambios en el archivo
-  const headFilePath = path.join(ruta, '.git', 'HEAD');
-  sendRamaNombreGit(ruta, puerto, event);
-  fs.watchFile(headFilePath, (curr, prev) => {
-    // Al detectar un cambio en el archivo HEAD
-    sendRamaNombreGit(ruta, puerto, event);
+ipcMain.handle('rama-actual', (event, ruta) => {
+  return new Promise((resolve, reject) => {
+    exec(`cd ${ruta} && git branch --show-current`, (error, stdout, stderr) => {
+      if(!error && !stderr && stdout){
+        resolve(stdout.trim());
+      }
+      resolve("No disponible")
+    })
   });
 });
 
-function sendRamaNombreGit(ruta, puerto, event){
-  exec('git branch --show-current', { cwd: ruta }, (error, stdout, stderr) => {
-    let ramaActual = "No disponible"
-    if (!error) {
-      ramaActual = stdout.trim();
-    }
-    event.sender.send(`rama-actual-${puerto}`, ramaActual);
-  });
-}
-
 ipcMain.handle('ramas-disponibles', (event, ruta) => {
   return new Promise((resolve, reject) => {
-    exec(`cd ${ruta} && git branch --all`, (error, stdout, stderr) => {
-      if (error || stderr) {
-        reject([]);
+    exec(`cd ${ruta} && git remote show origin`, async (error, stdout, stderr) => {
+      if(!stderr){
+        const ramaPrincipal = stdout.split("\n").find(linea => linea.includes("HEAD branch: "));
+        const nombreRamaPrincipal = ramaPrincipal.split("HEAD branch: ")[1];      
+        const listadoDeRamas = await obtenerListadoDeRamasDisponibles(ruta, nombreRamaPrincipal)
+        resolve(listadoDeRamas);
       }
-  
-      // Procesar la salida de los comandos
+      resolve([]);
+    })
+  })
+});
+
+ipcMain.handle('rama-actualizada', (event, ruta) => {
+  return new Promise((resolve, reject) => {
+    exec(`cd ${ruta} && git fetch && git status`, (error, stdout, stderr) => {
+      if (error || stderr) {
+        resolve(true);
+      }
+      const lineasSalida = stdout.split('\n');
+      const estaDesactualizada = lineasSalida.some(linea => linea.includes("behind"))
+      resolve(!estaDesactualizada);
+    });
+  })
+});
+
+ipcMain.handle('git-pull', (event, ruta) => {
+  return new Promise((resolve, reject) => {
+    exec(`cd ${ruta} && git pull`, async (error, stdout, stderr) => {
+      if (error || stderr) {
+        // Esto solo es para atajar el caso raro donde hice git fetch antes y luego borraron la rama remota
+        if(stderr.includes("no such ref was fetched")){
+          const {stdout, stderr} = await execPromise(`cd ${ruta} && git merge FETCH_HEAD`);
+          if(!stderr){
+            resolve({ok: true, mensajes: []})
+          }
+        }
+        resolve({ok: false, mensajes: [`Error: ${stderr}`]});
+      }
+      const mensajes = stdout.split('\n').map(mensaje => mensaje.trim());
+      resolve({ok: true, mensajes: mensajes});
+    });
+  })
+});
+
+
+ipcMain.handle('git-checkout', (event, ruta, rama) => {
+  return new Promise((resolve, reject) => {
+    exec(`cd ${ruta} && git checkout ${rama}`, (error, stdout, stderr) => {
+      if(error){
+        resolve({ok: false, mensajes: [error]});
+      }
+      if(stderr){
+        resolve({ok: false, mensajes: [stderr]});
+      }
+      const mensajes = stdout.split('\n').map(linea => linea.trim());
+      resolve({ok: true, mensajes: mensajes})
+    });
+  })
+});
+
+function obtenerListadoDeRamasDisponibles(ruta, ramaPrincipal){
+  // Si el repo tiene una rama principal, me traigo las ramas que no estan mergeadas a esa rama
+  // Sino me traigo todas las ramas
+  const comando = ramaPrincipal
+    ? `cd ${ruta} && git branch --all --no-merged ${ramaPrincipal.trim()}`
+    : `cd ${ruta} && git branch --all`
+
+  return new Promise((resolve, reject) => {
+    execPromise(comando, (error, stdout, stderr) => {
+      if (error || stderr) {
+        resolve([])
+      }
+    
+      // Proceso todas las lineas de la consola y las formateo
+      // Resultado nombresRamas: string[]
       const lineasSalida = stdout.split('\n');
       const ramas = lineasSalida
         .map(linea => linea.trim())
@@ -61,47 +121,6 @@ ipcMain.handle('ramas-disponibles', (event, ruta) => {
         }
       })
       resolve(ramasFiltradas);
-    });
+    });  
   })
-});
-
-ipcMain.handle('rama-actualizada', (event, ruta) => {
-  return new Promise((resolve, reject) => {
-    exec(`cd ${ruta} && git fetch && git status`, (error, stdout, stderr) => {
-      if (error || stderr) {
-        resolve(true);
-      }
-      const lineasSalida = stdout.split('\n');
-      const estaDesactualizada = lineasSalida.some(linea => linea.includes("behind"))
-      resolve(!estaDesactualizada);
-    });
-  })
-});
-
-ipcMain.handle('git-pull', (event, ruta) => {
-  return new Promise((resolve, reject) => {
-    exec(`cd ${ruta} && git pull`, (error, stdout, stderr) => {
-      if (error || stderr) {
-        resolve({ok: false, mensajes: ['Ocurrio un error al hacer git pull']});
-      }
-      const mensajes = stdout.split('\n').map(mensaje => mensaje.trim());
-      resolve({ok: true, mensajes: mensajes});
-    });
-  })
-});
-
-
-ipcMain.handle('git-checkout', (event, ruta, rama) => {
-  return new Promise((resolve, reject) => {
-    exec(`cd ${ruta} && git checkout ${rama}`, (error, stdout, stderr) => {
-      if(error){
-        resolve({ok: false, mensajes: [error]});
-      }
-      if(stderr){
-        resolve({ok: false, mensajes: [stderr]});
-      }
-      const mensajes = stdout.split('\n').map(linea => linea.trim());
-      resolve({ok: true, mensajes: mensajes})
-    });
-  })
-});
+}

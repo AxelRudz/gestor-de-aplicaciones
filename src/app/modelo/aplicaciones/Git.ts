@@ -58,11 +58,11 @@ export class Git {
       });
   }
 
-  escucharCambiosRamaActual(): void {
-    this.electronService.send("rama-actual", this.rutaRepo, this.puerto);
-    this.electronService.on(`rama-actual-${this.puerto}`, (event: any, nombre: string) => {        
-      this.ramaActual = nombre;
-    });
+  consultarRamaActual(): Promise<any> {
+    return this.electronService.invoke("rama-actual", this.rutaRepo)
+      .then((ramaActual: string) => {
+        this.ramaActual = ramaActual;
+      });    
   }
 
   consultarRamasDisponibles(): Promise<any> {
@@ -84,8 +84,8 @@ export class Git {
   }
 
   async iniciarTareasAutomaticas(): Promise<void> {
-    this.escucharCambiosRamaActual();
     while (true) {
+      await this.consultarRamaActual();
       await this.consultarRamasDisponibles();
       await this.consultarRamaActualizada();
       await new Promise(resolve => setTimeout(resolve, 10000));

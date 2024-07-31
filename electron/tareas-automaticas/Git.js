@@ -1,22 +1,9 @@
-// Obtengo todos los commits que se hicieron en las ramas remotas
-// git log --remotes --since="yesterday" --pretty=format:"%H|%an|%s"
-
-// Me sirve para obtener la lista de commits desde ayer en X rama.
-// Podria tener un archivo de control con todos los commits remotos al iniciar el dia de hoy.
-// Voy consultando cada cierto tiempo y si la consulta tiene mas commits que mi archivo de control,
-// agrego esos commits a mi archivo y muestro la informacion de los mismos en una notificacion
-
-// El archivo de control puede tener como nombre la fecha de hoy, de esa forma puedo saber si ya consulté en el dia,
-// debo borrar los archivos anteriores, etc...
-
-// Abajo hay codigo de como uso comandos git, notificaciones, etc...
 const { Notification, app } = require("electron");
 const { exec } = require("child_process");
 const { getCacheAplicacionesGuardadas } = require("../PersistenciaApps.js");
 const fs = require("fs");
 const util = require("util");
 const path = require("path");
-const { rejects } = require("assert");
 const { shell } = require("electron");
 const execPromise = util.promisify(exec);
 
@@ -26,11 +13,11 @@ const fechaHoy = new Date().toISOString().split("T")[0];
 const archivoRegistroCommitsPath = path.join(filePath, fechaHoy);
 
 const inicializarModuloTareasAutomaticas = () => {
-  validarArchivoControlCommits();
+  crearArchivoControlCommits();
   setInterval(() => verificarCommitsRemotosRepos(), 5000);
 }
 
-const validarArchivoControlCommits = () => {
+const crearArchivoControlCommits = () => {
   // Me fijo que exista la carpeta 'Registro de commits, sino la creo
   if(!fs.existsSync(filePath)){    
     fs.mkdirSync(filePath);
