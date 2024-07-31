@@ -33,6 +33,7 @@ export class ModalAgregarAppComponent {
       tipo: ["", [Validators.required]],
       nombre: ["", [Validators.required]],
       puerto: ["", [Validators.required]],
+      urlTableroTrello: [""],
       ruta: ["", [Validators.required]],
       comandoDeArranque: ["", [Validators.required]]
     });
@@ -53,6 +54,7 @@ export class ModalAgregarAppComponent {
   get campoTipo(){return this.formularioAgregarAplicacion.get("tipo")!}
   get campoNombre(){return this.formularioAgregarAplicacion.get("nombre")!}
   get campoPuerto(){return this.formularioAgregarAplicacion.get("puerto")!}
+  get urlTableroTrello(){return this.formularioAgregarAplicacion.get("urlTableroTrello")!}
   get campoRuta(){return this.formularioAgregarAplicacion.get("ruta")!}
   get campoComandoDeArranque(){return this.formularioAgregarAplicacion.get("comandoDeArranque")!}
 
@@ -91,16 +93,17 @@ export class ModalAgregarAppComponent {
       const puerto = this.campoPuerto.value;
       const comandoDeArranque = this.campoComandoDeArranque.value;
       const ruta = this.campoRuta.value;
+      const urlTableroTrello = this.urlTableroTrello.value ? this.urlTableroTrello.value : null;
 
       let app;
       if(this.campoTipo.value == TipoAplicacion.Angular){
-        app = new AplicacionAngular(nombre, Number.parseInt(puerto), ruta, comandoDeArranque, this.electronService, this.aplicacionService);
+        app = new AplicacionAngular(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService);
       }
       else if(this.campoTipo.value == TipoAplicacion.SpringBoot){
-        app = new AplicacionSpringBoot(nombre, Number.parseInt(puerto), ruta, comandoDeArranque, this.electronService, this.aplicacionService)
+        app = new AplicacionSpringBoot(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
       }
       else {
-        app = new AplicacionOtra(nombre, Number.parseInt(puerto), ruta, comandoDeArranque, this.electronService, this.aplicacionService)
+        app = new AplicacionOtra(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
       }
       
       if(this.aplicacionService.agregarAplicacion(app)){

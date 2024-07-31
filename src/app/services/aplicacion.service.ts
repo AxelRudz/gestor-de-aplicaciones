@@ -29,15 +29,16 @@ export class AplicacionService {
       .then((aplicacionesGuardadas: AplicacionElectronDTO[]) => {
         const listadoGeneradoDeApps: Aplicacion[] = [];
         aplicacionesGuardadas.forEach(app => {
+          const urlTableroTrello = app.urlTableroTrello ? app.urlTableroTrello : null;
           switch(app.tipo){
             case TipoAplicacion.Angular:
-              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, app.comandoDeArranque, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this))
               break;
             case TipoAplicacion.SpringBoot:
-              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, app.comandoDeArranque, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this))
               break;
             case TipoAplicacion.Otra:
-              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, app.comandoDeArranque, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this))
               break;
           }
         });
@@ -55,6 +56,7 @@ export class AplicacionService {
       nombre: aplicacion.getNombre(),
       ruta: aplicacion.getRuta(),
       puerto: aplicacion.getPuerto(),
+      urlTableroTrello: aplicacion.getUrlTableroTrello(),
       comandoDeArranque: aplicacion.getComandoDeArranque()
     }
     this.electronService.invoke('persistencia-agregar-aplicacion', aplicacionParaAgregar)

@@ -28,6 +28,11 @@
         </label>
         <input id="puertoApp" class="form-control" type="text" placeholder="Número de puerto..." formControlName="puerto">
 
+        <label for="urlTableroTrelloApp" class="form-label mt-3">
+          Tablero de Trello - URL
+        </label>
+        <input id="urlTableroTrelloApp" class="form-control" type="text" placeholder="https://trello.com/..." formControlName="urlTableroTrello">        
+
         <label for="comandoArranque" class="form-label mt-3">
           Comando para iniciar la aplicación
           <span class="text-danger">*</span>
@@ -50,11 +55,11 @@
           </button>
         </div>
 
-        <label for="puertoApp" class="form-label mt-3">
+        <label for="rutaApp" class="form-label mt-3">
           Directorio raíz de la aplicación <span class="text-danger">*</span>
         </label>
-        <div class="d-flex align-items-center">
-          <button class="btn btn-primary me-2" (click)="abrirDialogRuta()">
+        <div id="rutaApp" class="d-flex align-items-center">
+          <button class="btn btn-dark me-2" (click)="abrirDialogRuta()">
             <i class="fa-solid fa-folder-open me-1"></i>
             Seleccionar
           </button>        
@@ -65,7 +70,7 @@
 
       </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="agregarAplicacion()" [disabled]="formularioAgregarAplicacion.invalid">Agregar</button>
+        <button type="button" class="btn btn-primary" (click)="agregarAplicacion()" [disabled]="formularioAgregarAplicacion.invalid">Agregar aplicación</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" #btnCerrar>Cerrar</button>
       </div>
     </div>

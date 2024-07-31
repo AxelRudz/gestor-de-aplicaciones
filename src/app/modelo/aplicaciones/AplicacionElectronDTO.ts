@@ -6,5 +6,6 @@ export interface AplicacionElectronDTO {
   nombre: string;
   ruta: string;
   puerto: number;
+  urlTableroTrello: string | null;
   comandoDeArranque: string;
 }

@@ -6,7 +6,8 @@
       </th>
       <th>Puerto</th>
       <th>Rama actual</th>
-      <th>Abrir en IDE</th>
+      <th>VSCode</th>
+      <th>Trello</th>
       <th></th>
       <th style="border-radius: 0 10px 0 0;"></th>
     </tr>
@@ -52,7 +53,12 @@
       </td>
       <td>
         <div (click)="app.abrirEnIDE()" style="width: 45px; height: 45px; cursor: pointer; margin: 0 auto;">
-          <img src="assets/vscode.ico" class="text-light rounded" style="width: 45px; height: 45px;"/>
+          <img src="assets/logo-vscode.ico" class="text-light rounded" style="width: 45px; height: 45px;"/>
+        </div>
+      </td>
+      <td>
+        <div *ngIf="app.getUrlTableroTrello()" (click)="app.abrirTableroDeTrello()" style="width: 35px; height: 35px; cursor: pointer; margin: 0 auto;">
+          <img src="assets/logo-trello.ico" class="text-light rounded" style="width: 35px; height: 35px;"/>
         </div>
       </td>
       <td>

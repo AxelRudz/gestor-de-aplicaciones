@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron');
+const { ipcMain, shell } = require('electron');
 const treeKill = require("tree-kill");
 const { exec, spawn } = require("child_process");
 const util = require("util");
@@ -78,8 +78,6 @@ const detenerTodasLasApps = () => {
   )
 }
 
-
-
 ipcMain.handle('abrir-aplicacion-en-visual-studio', (event, ruta) => {
   return new Promise((resolve, reject) => {
     execPromise(`code -n ${ruta}`)
@@ -89,6 +87,18 @@ ipcMain.handle('abrir-aplicacion-en-visual-studio', (event, ruta) => {
       .catch(error => {
         reject(error)
       });
+  })
+});
+
+ipcMain.handle('abrir-tablero-de-trello', (event, url) => {
+  return new Promise((resolve, reject) => {
+    shell.openExternal(`${url}`)
+    .then( _ => {
+      resolve(true);
+    })
+    .catch(error => {
+      reject(error);
+    })
   })
 });
 

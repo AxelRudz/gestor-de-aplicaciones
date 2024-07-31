@@ -12,6 +12,7 @@ export abstract class Aplicacion {
   private nombre: string;
   private puerto: number;
   private ruta: string;
+  private urlTableroTrello: string | null;
   private comandoDeArranque: string;
   private git: Git;
   private terminal: Terminal;
@@ -23,6 +24,7 @@ export abstract class Aplicacion {
     nombre: string,
     puerto: number,
     ruta: string,
+    urlTableroTrello: string | null,
     comandoDeArranque: string,
     electronService: ElectronService,
     aplicacionService: AplicacionService,
@@ -30,7 +32,7 @@ export abstract class Aplicacion {
     this.nombre = nombre;
     this.puerto = puerto;
     this.ruta = ruta;
-    // La clase hija tendrá definido un comando para iniciar la app
+    this.urlTableroTrello = urlTableroTrello;
     this.comandoDeArranque = comandoDeArranque;
     this.pidProceso = null;
     this.terminal = new Terminal();    
@@ -92,6 +94,14 @@ export abstract class Aplicacion {
     });
   }
 
+  abrirTableroDeTrello(): void {
+    this.terminal.agregarMensaje(`Abriendo tablero de ${this.nombre} en Trello...`);
+    this.electronService.invoke("abrir-tablero-de-trello", this.urlTableroTrello)
+    .catch(error => {
+      console.error("Ocurrió un error abriendo la app en Visual Studio Code. Error: ", error)
+    });
+  }
+
   getNombre(): string {
     return this.nombre;
   }
@@ -136,5 +146,12 @@ export abstract class Aplicacion {
     this.comandoDeArranque = comandoDeArranque;
   }
 
+  getUrlTableroTrello(): string | null {
+    return this.urlTableroTrello;
+  }
+
+  setUrlTableroTrello(urlTableroTrello: string | null): void {
+    this.urlTableroTrello = urlTableroTrello;
+  }
 
 }
