@@ -11,6 +11,7 @@ import { AplicacionAngular } from '../modelo/aplicaciones/tipos/AplicacionAngula
 })
 export class TablaAplicacionesComponent {
 
+  // Lo usa el componente Terminal -> Muestra automaticamente la terminal de la última app con la que se interactuó
   @Output() seInteractuoConUnaApp: EventEmitter<Aplicacion> = new EventEmitter<Aplicacion>();
 
   aplicaciones: Aplicacion[] = [];
@@ -45,30 +46,24 @@ export class TablaAplicacionesComponent {
     if(this.estaEnEjecucion(app)){
       app.detener()
         .then(ok => {          
-          this.emitirCambioApp(app);
+          this.seInteractuoConUnaApp.emit(app);
         })
         .catch(error => console.error("Ocurrió un error deteniendo la app. Error: ", error));
     }
     else {
       app.iniciar();
-      this.emitirCambioApp(app);
+      this.seInteractuoConUnaApp.emit(app);
     }    
   }
 
   moverseDeRama(app: Aplicacion, rama: string){
     app.getGit().gitCheckout(rama);
-    this.emitirCambioApp(app);
+    this.seInteractuoConUnaApp.emit(app);
   }
 
   gitPull(app: Aplicacion){
     app.getGit().gitPull();
-    this.emitirCambioApp(app);
-  }
-
-  emitirCambioApp(app: Aplicacion){
     this.seInteractuoConUnaApp.emit(app);
   }
-
-
 
 }

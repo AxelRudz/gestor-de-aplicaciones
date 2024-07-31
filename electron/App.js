@@ -1,9 +1,10 @@
 const { ipcMain } = require('electron');
 const treeKill = require("tree-kill");
-const { spawn } = require("child_process");
+const { exec, spawn } = require("child_process");
+const util = require("util");
+const execPromise = util.promisify(exec);
 var Convert = require('ansi-to-html');
 var convert = new Convert();
-
 
 const pidsAplicacionesCorriendo = [];
 
@@ -76,6 +77,23 @@ const detenerTodasLasApps = () => {
     })
   )
 }
+
+
+
+ipcMain.handle('abrir-aplicacion-en-visual-studio', (event, ruta) => {
+  return new Promise((resolve, reject) => {
+    execPromise(`code -n ${ruta}`)
+      .then(({ stdout, stderr }) => {
+        resolve(!stderr)
+      })
+      .catch(error => {
+        reject(error)
+      });
+  })
+});
+
+
+
 
 module.exports = {
   matarProceso,
