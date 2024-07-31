@@ -72,14 +72,19 @@ export class AplicacionService {
       })
   }
 
-  agregarAplicacion(app: Aplicacion): boolean {
-    if(this.aplicaciones.some(appAgregada => appAgregada.getPuerto() == app.getPuerto())){
-      return false;
-    }
-    this.persistenciaAgregarAplicacion(app);
-    this.aplicaciones.push(app);
-    this.aplicacionesSubject.next(this.aplicaciones);
-    return true;
+  agregarAplicacion(app: Aplicacion): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const appConMismoPuerto = this.aplicaciones.find(appAgregada => appAgregada.getPuerto() == app.getPuerto());
+      if(appConMismoPuerto){
+        reject(`El puerto elegido está siendo usado por: ${appConMismoPuerto.getNombre()}.`);
+      }
+      else {
+        this.persistenciaAgregarAplicacion(app);
+        this.aplicaciones.push(app);
+        this.aplicacionesSubject.next(this.aplicaciones);
+        resolve();
+      }
+    })  
   }
 
   eliminarAplicacion(aplicacion: Aplicacion){

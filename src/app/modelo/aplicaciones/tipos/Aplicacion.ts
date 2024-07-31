@@ -84,11 +84,6 @@ export abstract class Aplicacion {
   abrirEnIDE(): void {
     this.terminal.agregarMensaje(`Abriendo ${this.nombre} en Visual Studio Code...`);
     this.electronService.invoke("abrir-aplicacion-en-visual-studio", this.ruta)
-    .then( ok => {
-      if(ok){
-        this.terminal.agregarMensaje("Ventana abierta con éxito.");
-      }
-    })
     .catch(error => {
       console.error("Ocurrió un error abriendo la app en Visual Studio Code. Error: ", error)
     });

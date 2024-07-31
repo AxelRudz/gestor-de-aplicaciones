@@ -17,6 +17,7 @@ export class ModalAgregarAppComponent {
   @ViewChild("btnCerrar") btnCerrar!: ElementRef;
 
   formularioAgregarAplicacion!: FormGroup;
+  mensajeDeError = "";
   // Enum que usa el formulario para elegir el tipo de aplicacion que va a crear
   TipoAplicacion = TipoAplicacion
 
@@ -35,10 +36,8 @@ export class ModalAgregarAppComponent {
       puerto: ["", [Validators.required]],
       urlTableroTrello: [""],
       ruta: ["", [Validators.required]],
-      comandoDeArranque: ["", [Validators.required]]
+      comandoDeArranque: [{value: "", disabled: true}, [Validators.required]]
     });
-    // Deshabilito por defecto el campo comando de arranque
-    this.campoComandoDeArranque.disable();
     // Cuando cambia el tipo de app, recalculo el comando de arranque
     this.campoTipo.valueChanges.subscribe((tipo: TipoAplicacion | "") => {
       this.campoComandoDeArranque.setValue(this.devolverComandoIniciarPorDefecto(tipo));
@@ -106,16 +105,24 @@ export class ModalAgregarAppComponent {
         app = new AplicacionOtra(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
       }
       
-      if(this.aplicacionService.agregarAplicacion(app)){
-        // Si no especifico tipo: "", no aparece "Seleccione el tipo de aplicación..." en el formulario
-        this.formularioAgregarAplicacion.reset({tipo: ""}) 
+      this.aplicacionService.agregarAplicacion(app)
+      .then( _ => {
+        this.resetearFormulario();
         this.renderer.selectRootElement(this.btnCerrar.nativeElement, true).click();
-      }
+      })
+      .catch(mensajeDeError => {
+        this.mensajeDeError = mensajeDeError;
+      })
     }
     else {
       alert("Formulario inválido.");
     }
   }
 
+  resetearFormulario(){
+    // Si no especifico tipo: "", no aparece "Seleccione el tipo de aplicación..." en el formulario
+    this.formularioAgregarAplicacion.reset({tipo: "", comandoDeArranque: {value: "", disabled: true}}) 
+    this.mensajeDeError = "";
+  }
 }
 

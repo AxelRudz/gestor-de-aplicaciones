@@ -68,10 +68,18 @@
           </span>
         </div>        
 
+        <div *ngIf="mensajeDeError" class="alert alert-danger p-2 mt-4" role="alert">
+          <strong>Error! </strong>{{mensajeDeError}}
+        </div>
+
       </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="agregarAplicacion()" [disabled]="formularioAgregarAplicacion.invalid">Agregar aplicación</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" #btnCerrar>Cerrar</button>
+        <button type="button" class="btn btn-primary" (click)="agregarAplicacion()" [disabled]="formularioAgregarAplicacion.invalid">
+          Agregar aplicación
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="resetearFormulario()" data-bs-dismiss="modal" #btnCerrar>
+          Cerrar
+        </button>
       </div>
     </div>
   </div>
