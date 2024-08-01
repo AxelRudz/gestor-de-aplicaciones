@@ -74,7 +74,6 @@ export abstract class Aplicacion {
     this.detener()
       .then(ok => {
         if(ok){
-          this.getGit().removeListeners();
           this.aplicacionService.eliminarAplicacion(this);
         }
       })

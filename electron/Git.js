@@ -4,6 +4,10 @@ const { exec } = require('child_process');
 const execPromise = util.promisify(exec);
 
 ipcMain.handle('rama-actual', (event, ruta) => {
+  return promesaRamaActual(ruta);
+});
+
+const promesaRamaActual = (ruta) => {
   return new Promise((resolve, reject) => {
     exec(`cd ${ruta} && git branch --show-current`, (error, stdout, stderr) => {
       if(!error && !stderr && stdout){
@@ -12,7 +16,7 @@ ipcMain.handle('rama-actual', (event, ruta) => {
       resolve("No disponible")
     })
   });
-});
+}
 
 ipcMain.handle('ramas-disponibles', (event, ruta) => {
   return new Promise((resolve, reject) => {
@@ -45,13 +49,6 @@ ipcMain.handle('git-pull', (event, ruta) => {
   return new Promise((resolve, reject) => {
     exec(`cd ${ruta} && git pull`, async (error, stdout, stderr) => {
       if (error || stderr) {
-        // Esto solo es para atajar el caso raro donde hice git fetch antes y luego borraron la rama remota
-        if(stderr.includes("no such ref was fetched")){
-          const {stdout, stderr} = await execPromise(`cd ${ruta} && git merge FETCH_HEAD`);
-          if(!stderr){
-            resolve({ok: true, mensajes: []})
-          }
-        }
         resolve({ok: false, mensajes: [`Error: ${stderr}`]});
       }
       const mensajes = stdout.split('\n').map(mensaje => mensaje.trim());

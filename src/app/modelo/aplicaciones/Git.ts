@@ -79,10 +79,6 @@ export class Git {
       });
   }
 
-  removeListeners(): void {
-    this.electronService.removeAllListeners(`rama-actual-${this.puerto}`);
-  }
-
   async iniciarTareasAutomaticas(): Promise<void> {
     while (true) {
       await this.consultarRamaActual();
