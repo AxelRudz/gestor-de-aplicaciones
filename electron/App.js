@@ -90,6 +90,18 @@ ipcMain.handle('abrir-aplicacion-en-visual-studio', (event, ruta) => {
   })
 });
 
+ipcMain.handle('abrir-en-navegador', (event, puerto) => {
+  return new Promise((resolve, reject) => {
+    shell.openExternal(`http://localhost:${puerto}`)
+    .then( _ => {
+      resolve(true);
+    })
+    .catch(error => {
+      reject(error);
+    })
+  })
+});
+
 ipcMain.handle('abrir-tablero-de-trello', (event, url) => {
   return new Promise((resolve, reject) => {
     shell.openExternal(`${url}`)

@@ -69,6 +69,10 @@ export abstract class Aplicacion {
     this.terminal.agregarMensaje("Error deteniendo la aplicación.");
     return false;
   }
+
+  estaEnEjecucion(): boolean {
+    return this.pidProceso != null;
+  }
   
   eliminar(): void {
     this.detener()
@@ -89,7 +93,20 @@ export abstract class Aplicacion {
       }
     })
     .catch(error => {
-      console.error("Ocurrió un error abriendo la app en Visual Studio Code. Error: ", error)
+      console.error("Ocurrió un error abriendo la aplicación en Visual Studio Code. Error: ", error)
+    });
+  }
+
+  abrirEnNavegador(): void {
+    this.terminal.agregarMensaje(`Abriendo ${this.nombre} en el navegador...`);
+    this.electronService.invoke("abrir-en-navegador", this.puerto)
+    .then( ok => {
+      if(ok){
+        this.terminal.agregarMensaje("Acción finalizada.");
+      }
+    })
+    .catch(error => {
+      console.error("Ocurrió un error abriendo la aplicación en el navegador. Error: ", error)
     });
   }
 

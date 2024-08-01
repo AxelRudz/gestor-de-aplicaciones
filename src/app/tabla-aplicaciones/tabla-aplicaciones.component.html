@@ -7,7 +7,12 @@
       <th>Puerto</th>
       <th>Rama actual</th>
       <th>VSCode</th>
-      <th *ngIf="alMenosUnaAplicacionTieneTrello()">Trello</th>
+      <th *ngIf="alMenosUnaAplicacionTieneTrello()">
+        Trello
+      </th>
+      <th *ngIf="alMenosUnaAplicacionEstaEnEjecucion()">
+        Abrir
+      </th>
       <th></th>
       <th style="border-radius: 0 10px 0 0;"></th>
     </tr>
@@ -61,11 +66,16 @@
           <img src="assets/logo-trello.ico" class="text-light rounded" style="width: 35px; height: 35px;"/>
         </div>
       </td>
+      <td *ngIf="alMenosUnaAplicacionEstaEnEjecucion()">
+        <div *ngIf="app.estaEnEjecucion()" (click)="app.abrirEnNavegador()" style="width: 40px; height: 40px; cursor: pointer; margin: 0 auto;">
+          <img src="assets/logo-web.ico" class="text-light rounded" style="width: 40px; height: 40px;"/>
+        </div>
+      </td>
       <td>
-        <button *ngIf="estaEnEjecucion(app)" (click)="toggleApp(app)" class="btn btn-danger">
+        <button *ngIf="app.estaEnEjecucion()" (click)="toggleApp(app)" class="btn btn-danger">
           <i class="fa-solid fa-stop me-2"></i> Detener
         </button>
-        <button *ngIf="!estaEnEjecucion(app)" (click)="toggleApp(app)" class="btn btn-primary">
+        <button *ngIf="!app.estaEnEjecucion()" (click)="toggleApp(app)" class="btn btn-primary">
           <i class="fa-solid fa-play me-2"></i> Iniciar
         </button>
       </td>

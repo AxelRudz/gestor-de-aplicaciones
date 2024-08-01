@@ -70,4 +70,8 @@ export class TablaAplicacionesComponent {
     return this.aplicaciones.some(app => app.getUrlTableroTrello());
   }
 
+  alMenosUnaAplicacionEstaEnEjecucion(): boolean {
+    return this.aplicaciones.some(app => app.estaEnEjecucion());
+  }
+
 }
