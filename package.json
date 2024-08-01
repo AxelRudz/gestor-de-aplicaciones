@@ -71,7 +71,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "./src/assets/icono1.ico",
+      "icon": "./src/assets/logo-app2rounded.ico",
       "artifactName": "Repo Manager.exe"
     },
     "nsis": {
@@ -83,9 +83,9 @@
       "createStartMenuShortcut": true,
       "deleteAppDataOnUninstall": true,
       "shortcutName": "Repo Manager",
-      "installerIcon": "./src/assets/icono1.ico",
-      "uninstallerIcon": "./src/assets/icono1.ico",
-      "installerHeaderIcon": "./src/assets/icono1.ico"
+      "installerIcon": "./src/assets/logo-app2rounded.ico",
+      "uninstallerIcon": "./src/assets/logo-app2rounded.ico",
+      "installerHeaderIcon": "./src/assets/logo-app2rounded.ico"
     }
   }
 }

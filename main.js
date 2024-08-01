@@ -16,7 +16,7 @@ function createWindow () {
 
   win = new BrowserWindow({
     title: "Repo Manager - Platinum Edition",
-    icon: path.join(__dirname, 'src', 'assets', 'icono1.ico'),
+    icon: path.join(__dirname, 'src', 'assets', 'logo-app2rounded.ico'),
     width: 1200,
     height: 900,
     resizable: true,    
