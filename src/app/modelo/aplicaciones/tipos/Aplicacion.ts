@@ -39,18 +39,28 @@ export abstract class Aplicacion {
     this.git = new Git(ruta, puerto, electronService, this.terminal);
     this.electronService = electronService;
     this.aplicacionService = aplicacionService;
+
+    // Suscripcion que usa el iniciar
+    this.electronService.on(`iniciar-aplicacion-${this.puerto}`, (event: any, pid: number | null, mensaje: string) => {
+      this.pidProceso = pid;
+      this.terminal.agregarMensaje(mensaje)
+      if(pid == null){
+        this.puedeIniciarLaApp = true;
+      }
+    });
   }
+
+  private puedeIniciarLaApp = true;
   
   abstract getTipoAplicacion(): TipoAplicacion;
   abstract getLogoUrl(): string;
 
   iniciar(): void {
-    this.terminal.setMensajes([`Iniciando aplicación...`])
-    this.electronService.send("iniciar-aplicacion", this.puerto, this.ruta, this.comandoDeArranque);
-    this.electronService.on(`iniciar-aplicacion-${this.puerto}`, (event: any, pid: number | null, mensaje: string) => {
-      this.pidProceso = pid;
-      this.terminal.agregarMensaje(mensaje)
-    });
+    if(!this.pidProceso && this.puedeIniciarLaApp){
+      this.puedeIniciarLaApp = false;
+      this.terminal.setMensajes([`Iniciando aplicación...`])
+      this.electronService.send("iniciar-aplicacion", this.puerto, this.ruta, this.comandoDeArranque);
+    }
   }
 
   async detener(): Promise<boolean> {
@@ -59,6 +69,7 @@ export abstract class Aplicacion {
       const ok = await this.electronService.invoke("detener-aplicacion", this.pidProceso)
       if(ok){
         this.pidProceso = null;
+        this.puedeIniciarLaApp = true;
         this.terminal.agregarMensaje("Aplicación detenida.");
         return true;
       }

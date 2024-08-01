@@ -8,15 +8,15 @@ require("./electron/PersistenciaApps.js");
 const { inicializarModuloTareasAutomaticas } = require("./electron/tareas-automaticas/Git.js");
 const { detenerTodasLasApps } = require("./electron/App.js");
 
-app.setAppUserModelId("REPO MANAGER - Platinum Edition")
+app.setAppUserModelId("Repo Manager - Platinum Edition")
 
 let win;
 
 function createWindow () {
 
   win = new BrowserWindow({
-    title: "REPO MANAGER - Platinum Edition",
-    icon: path.join(__dirname, 'src', 'assets', 'logo-app.png'),
+    title: "Repo Manager - Platinum Edition",
+    icon: path.join(__dirname, 'src', 'assets', 'icono1.ico'),
     width: 1200,
     height: 900,
     resizable: true,    
@@ -31,7 +31,7 @@ function createWindow () {
   // win.webContents.openDevTools()
 
   win.loadURL(`http://localhost:4000`); // <-- Usado para el hot reload
-  // win.loadURL(`file://${__dirname}/dist/repo-manager/index.html`); //<-- Todavia no estan seteados los ambientes, esto se usa en produccion
+  //win.loadURL(`file://${__dirname}/dist/repo-manager/index.html`); //<-- Todavia no estan seteados los ambientes, esto se usa en produccion
 
   win.setMenu(null);
 

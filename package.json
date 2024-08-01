@@ -30,6 +30,7 @@
     "@angular/router": "^16.0.0",
     "ansi_up": "^6.0.2",
     "ansi-to-html": "^0.7.2",
+    "repo-manager": "file:",
     "rxjs": "~7.8.0",
     "tree-kill": "^1.2.2",
     "tslib": "^2.3.0",
@@ -55,8 +56,8 @@
   },
   "build": {
     "asar": true,
-    "appId": "REPO MANAGER - Platinum Edition",
-    "productName": "REPO MANAGER - Platinum Edition",
+    "appId": "Repo Manager - Platinum Edition",
+    "productName": "Repo Manager - Platinum Edition",
     "files": [
       "dist/**/*",
       "electron/**/*",
@@ -70,8 +71,8 @@
       "target": [
         "nsis"
       ],
-      "icon": "./src/assets/logo-app.png",
-      "artifactName": "REPO MANAGER - Platinum Edition.exe"
+      "icon": "./src/assets/icono1.ico",
+      "artifactName": "Repo Manager.exe"
     },
     "nsis": {
       "oneClick": false,
@@ -81,10 +82,10 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "deleteAppDataOnUninstall": true,
-      "shortcutName": "REPO MANAGER - Platinum Edition",
-      "installerIcon": "./src/assets/logo-app.png",
-      "uninstallerIcon": "./src/assets/logo-app.png",
-      "installerHeaderIcon": "./src/assets/logo-app.png"
+      "shortcutName": "Repo Manager",
+      "installerIcon": "./src/assets/icono1.ico",
+      "uninstallerIcon": "./src/assets/icono1.ico",
+      "installerHeaderIcon": "./src/assets/icono1.ico"
     }
   }
 }
