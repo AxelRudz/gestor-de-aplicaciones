@@ -61,11 +61,8 @@ ipcMain.handle('git-pull', (event, ruta) => {
 ipcMain.handle('git-checkout', (event, ruta, rama) => {
   return new Promise((resolve, reject) => {
     exec(`cd ${ruta} && git checkout ${rama}`, (error, stdout, stderr) => {
-      if(error){
+      if(error){        
         resolve({ok: false, mensajes: [error]});
-      }
-      if(stderr){
-        resolve({ok: false, mensajes: [stderr]});
       }
       const mensajes = stdout.split('\n').map(linea => linea.trim());
       resolve({ok: true, mensajes: mensajes})
