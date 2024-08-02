@@ -4,7 +4,7 @@ const path = require("path");
 // Importo otros archivos de mi app
 require("./electron/App.js");
 require("./electron/Git.js");
-require("./electron/PersistenciaApps.js");
+const persistenciaApps = require("./electron/PersistenciaApps.js");
 const { inicializarModuloTareasAutomaticas } = require("./electron/tareas-automaticas/Git.js");
 const { detenerTodasLasApps } = require("./electron/App.js");
 
@@ -12,7 +12,7 @@ app.setAppUserModelId("Repo Manager - Platinum Edition")
 
 let win;
 
-function createWindow () {
+async function createWindow () {
 
   win = new BrowserWindow({
     title: "Repo Manager - Platinum Edition",
@@ -35,6 +35,7 @@ function createWindow () {
 
   win.setMenu(null);
 
+  await persistenciaApps.normalizarIdsDeAplicaciones();
   inicializarModuloTareasAutomaticas();
 
 }

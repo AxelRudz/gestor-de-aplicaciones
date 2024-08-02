@@ -8,7 +8,7 @@ var convert = new Convert();
 
 const pidsAplicacionesCorriendo = [];
 
-ipcMain.on('iniciar-aplicacion', (event, puerto, ruta, comando) => {
+ipcMain.on('iniciar-aplicacion', (event, idApp, ruta, comando) => {
   // Creo el proceso
   const proceso = spawn(comando, {
     shell: true,
@@ -24,7 +24,7 @@ ipcMain.on('iniciar-aplicacion', (event, puerto, ruta, comando) => {
     if(data){
       console.log(`stdout: ${data}`);
       const mensaje = data ? convert.toHtml(data.toString()) : data.toString()
-      event.sender.send(`iniciar-aplicacion-${puerto}`, pid, mensaje);
+      event.sender.send(`iniciar-aplicacion-${idApp}`, pid, mensaje);
     }
   });
 
@@ -32,7 +32,7 @@ ipcMain.on('iniciar-aplicacion', (event, puerto, ruta, comando) => {
     if(error){
       console.error(`stderr: ${error}`);
       const mensaje = convert.toHtml(error.toString())
-      event.sender.send(`iniciar-aplicacion-${puerto}`, pid, mensaje);
+      event.sender.send(`iniciar-aplicacion-${idApp}`, pid, mensaje);
     }
   });
 });

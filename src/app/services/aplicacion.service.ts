@@ -33,16 +33,16 @@ export class AplicacionService {
           const urlTableroTrello = app.urlTableroTrello ? app.urlTableroTrello : null;
           switch(app.tipo){
             case TipoAplicacion.Angular:
-              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
+              listadoGeneradoDeApps.push(new AplicacionAngular(app.id, app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
               break;
             case TipoAplicacion.SpringBoot:
-              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
+              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.id, app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
               break;
             case TipoAplicacion.NestJS:
-              listadoGeneradoDeApps.push(new AplicacionNestJS(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
+              listadoGeneradoDeApps.push(new AplicacionNestJS(app.id, app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
               break;
             case TipoAplicacion.Otra:
-              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
+              listadoGeneradoDeApps.push(new AplicacionOtra(app.id, app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
               break;
           }
         });
@@ -56,6 +56,7 @@ export class AplicacionService {
 
   persistenciaAgregarAplicacion(aplicacion: Aplicacion){
     const aplicacionParaAgregar: AplicacionElectronDTO = {
+      id: aplicacion.getId(),
       tipo: aplicacion.getTipoAplicacion(),
       nombre: aplicacion.getNombre(),
       ruta: aplicacion.getRuta(),
@@ -70,31 +71,22 @@ export class AplicacionService {
   }
 
   persistenciaEliminarAplicacion(aplicacion: Aplicacion): Promise<any>{
-    return this.electronService.invoke('persistencia-eliminar-aplicacion', aplicacion.getPuerto(), aplicacion.getPidProceso())
+    return this.electronService.invoke('persistencia-eliminar-aplicacion', aplicacion.getId(), aplicacion.getPidProceso())
       .catch(error => {
         console.error(error);
       })
   }
 
-  agregarAplicacion(app: Aplicacion): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const appConMismoPuerto = this.aplicaciones.find(appAgregada => appAgregada.getPuerto() == app.getPuerto());
-      if(appConMismoPuerto){
-        reject(`El puerto elegido está siendo usado por: ${appConMismoPuerto.getNombre()}.`);
-      }
-      else {
-        this.persistenciaAgregarAplicacion(app);
-        this.aplicaciones.push(app);
-        this.aplicacionesSubject.next(this.aplicaciones);
-        resolve();
-      }
-    })  
+  agregarAplicacion(app: Aplicacion): void {
+    this.persistenciaAgregarAplicacion(app);
+    this.aplicaciones.push(app);
+    this.aplicacionesSubject.next(this.aplicaciones);
   }
 
   eliminarAplicacion(aplicacion: Aplicacion){
     this.persistenciaEliminarAplicacion(aplicacion)
     .then( _ => {
-      this.aplicaciones = this.aplicaciones.filter(aplicacionAgregada => aplicacionAgregada.getPuerto() != aplicacion.getPuerto());
+      this.aplicaciones = this.aplicaciones.filter(aplicacionAgregada => aplicacionAgregada.getId() != aplicacion.getId());
       this.aplicacionesSubject.next(this.aplicaciones);
     })
   }
