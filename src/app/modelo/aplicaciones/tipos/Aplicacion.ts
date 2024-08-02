@@ -36,14 +36,14 @@ export abstract class Aplicacion {
     this.comandoDeArranque = comandoDeArranque;
     this.pidProceso = null;
     this.terminal = new Terminal();    
-    this.git = new Git(ruta, puerto, electronService, this.terminal);
+    this.git = new Git(ruta, electronService, this.terminal);
     this.electronService = electronService;
     this.aplicacionService = aplicacionService;
 
     // Suscripcion que usa el iniciar
     this.electronService.on(`iniciar-aplicacion-${this.puerto}`, (event: any, pid: number | null, mensaje: string) => {
       this.pidProceso = pid;
-      this.terminal.agregarMensaje(mensaje)
+      this.terminal.agregarMensaje(mensaje);
       if(pid == null){
         this.puedeIniciarLaApp = true;
       }
@@ -66,7 +66,7 @@ export abstract class Aplicacion {
   async detener(): Promise<boolean> {
     this.terminal.agregarMensaje("Deteniendo aplicación...");
     try {
-      const ok = await this.electronService.invoke("detener-aplicacion", this.pidProceso)
+      const ok = await this.electronService.invoke("detener-aplicacion", this.pidProceso);
       if(ok){
         this.pidProceso = null;
         this.puedeIniciarLaApp = true;
@@ -104,7 +104,7 @@ export abstract class Aplicacion {
       }
     })
     .catch(error => {
-      console.error("Ocurrió un error abriendo la aplicación en Visual Studio Code. Error: ", error)
+      console.error("Ocurrió un error abriendo la aplicación en Visual Studio Code. Error: ", error);
     });
   }
 
@@ -117,7 +117,7 @@ export abstract class Aplicacion {
       }
     })
     .catch(error => {
-      console.error("Ocurrió un error abriendo la aplicación en el navegador. Error: ", error)
+      console.error("Ocurrió un error abriendo la aplicación en el navegador. Error: ", error);
     });
   }
 

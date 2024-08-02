@@ -4,16 +4,14 @@ import { Terminal } from "./Terminal";
 export class Git {
   
   private rutaRepo: string;
-  private puerto: number;
   private ramaActual: string;
   private ramasDisponibles: string[];
   private ramaActualizada: boolean;
   private electronService: ElectronService;  
   private terminal: Terminal;
 
-  constructor(rutaRepo: string, puerto: number, electronService: ElectronService, terminal: Terminal){
+  constructor(rutaRepo: string, electronService: ElectronService, terminal: Terminal){
     this.rutaRepo = rutaRepo;
-    this.puerto = puerto;
     this.ramaActual = "";
     this.ramasDisponibles = [];
     this.ramaActualizada = true;

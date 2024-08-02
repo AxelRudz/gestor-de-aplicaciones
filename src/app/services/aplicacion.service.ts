@@ -7,6 +7,7 @@ import { AplicacionSpringBoot } from '../modelo/aplicaciones/tipos/AplicacionSpr
 import { AplicacionElectronDTO } from '../modelo/aplicaciones/AplicacionElectronDTO';
 import { TipoAplicacion } from '../modelo/aplicaciones/enums/TipoAplicacion';
 import { AplicacionOtra } from '../modelo/aplicaciones/tipos/AplicacionOtra';
+import { AplicacionNestJS } from '../modelo/aplicaciones/tipos/AplicacionNestJS';
 
 @Injectable({
   providedIn: 'root'
@@ -32,13 +33,16 @@ export class AplicacionService {
           const urlTableroTrello = app.urlTableroTrello ? app.urlTableroTrello : null;
           switch(app.tipo){
             case TipoAplicacion.Angular:
-              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionAngular(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
               break;
             case TipoAplicacion.SpringBoot:
-              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionSpringBoot(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
+              break;
+            case TipoAplicacion.NestJS:
+              listadoGeneradoDeApps.push(new AplicacionNestJS(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
               break;
             case TipoAplicacion.Otra:
-              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this))
+              listadoGeneradoDeApps.push(new AplicacionOtra(app.nombre, app.puerto, app.ruta, urlTableroTrello, app.comandoDeArranque, this.electronService, this));
               break;
           }
         });

@@ -6,6 +6,7 @@ import { AplicacionAngular } from '../modelo/aplicaciones/tipos/AplicacionAngula
 import { AplicacionSpringBoot } from '../modelo/aplicaciones/tipos/AplicacionSpringBoot';
 import { TipoAplicacion } from '../modelo/aplicaciones/enums/TipoAplicacion';
 import { AplicacionOtra } from '../modelo/aplicaciones/tipos/AplicacionOtra';
+import { AplicacionNestJS } from '../modelo/aplicaciones/tipos/AplicacionNestJS';
 
 @Component({
   selector: 'app-modal-agregar-app',
@@ -73,6 +74,8 @@ export class ModalAgregarAppComponent {
         return AplicacionAngular.getComandoDeArranquePorDefecto(puerto);
       case TipoAplicacion.SpringBoot:
         return AplicacionSpringBoot.getComandoDeArranquePorDefecto(puerto);
+      case TipoAplicacion.NestJS:
+        return AplicacionNestJS.getComandoDeArranquePorDefecto(puerto);
       case TipoAplicacion.Otra:
         return AplicacionOtra.getComandoDeArranquePorDefecto(puerto);
       default:
@@ -100,6 +103,9 @@ export class ModalAgregarAppComponent {
       }
       else if(this.campoTipo.value == TipoAplicacion.SpringBoot){
         app = new AplicacionSpringBoot(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
+      }
+      else if(this.campoTipo.value == TipoAplicacion.NestJS){
+        app = new AplicacionNestJS(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
       }
       else {
         app = new AplicacionOtra(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)

@@ -1,18 +1,18 @@
 import { Aplicacion } from "./Aplicacion";
 import { TipoAplicacion } from "src/app/modelo/aplicaciones/enums/TipoAplicacion";
 
-export class AplicacionAngular extends Aplicacion {
+export class AplicacionNestJS extends Aplicacion {
 
   static getComandoDeArranquePorDefecto(puerto: string): string {
-    return `ng serve --port ${puerto}`;
+    return `npm run start`
   }
 
   override getLogoUrl(): string {
-    return "./assets/logo-angular.png";
+    return "./assets/logo-nest.ico";
   }
 
   override getTipoAplicacion(): TipoAplicacion {
-    return TipoAplicacion.Angular;
+    return TipoAplicacion.NestJS;
   }
   
 }
