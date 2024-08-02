@@ -59,6 +59,10 @@ ipcMain.handle('detener-aplicacion', (event, pid) => {
 const matarProceso = (pid) => {
   return new Promise((resolve, reject) =>{
     treeKill(pid,'SIGTERM',(err) => {
+      // Si hubo un error porque no encontró el pid, lo tomo como que se borró correctamente.
+      if(err && err.code == 128){
+        resolve(true)
+      }
       resolve(!err)
     });
   });
