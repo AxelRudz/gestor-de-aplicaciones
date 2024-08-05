@@ -28,10 +28,10 @@ function createWindow () {
   })
   nativeTheme.themeSource = "dark";
 
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 
-  win.loadURL(`http://localhost:4000`); // <-- Usado para el hot reload
-  // win.loadURL(`file://${__dirname}/dist/repo-manager/index.html`); //<-- Todavia no estan seteados los ambientes, esto se usa en produccion
+  // win.loadURL(`http://localhost:4000`); // <-- Usado para el hot reload
+  win.loadURL(`file://${__dirname}/dist/repo-manager/index.html`); //<-- Todavia no estan seteados los ambientes, esto se usa en produccion
 
   win.setMenu(null);
 
