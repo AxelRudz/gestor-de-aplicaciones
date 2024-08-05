@@ -24,7 +24,7 @@ export class TerminalesAppsComponent {
       }
       else {
         // Si hay aplicaciones disponibles pero la elegida es nula o no está, selecciono la primera que me viene
-        if(this.appElegida == null || !this.apps.some(app => app.getPuerto() == this.appElegida!.getPuerto())){
+        if(this.appElegida == null || !this.apps.some(app => app.getId() == this.appElegida!.getId())){
           this.appElegida = this.apps[0];
         }
         // Sino, seguiria todo igual

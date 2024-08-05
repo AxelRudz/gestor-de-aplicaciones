@@ -6,6 +6,8 @@ import { AplicacionAngular } from '../modelo/aplicaciones/tipos/AplicacionAngula
 import { AplicacionSpringBoot } from '../modelo/aplicaciones/tipos/AplicacionSpringBoot';
 import { TipoAplicacion } from '../modelo/aplicaciones/enums/TipoAplicacion';
 import { AplicacionOtra } from '../modelo/aplicaciones/tipos/AplicacionOtra';
+import { AplicacionNestJS } from '../modelo/aplicaciones/tipos/AplicacionNestJS';
+import { Aplicacion } from '../modelo/aplicaciones/tipos/Aplicacion';
 
 @Component({
   selector: 'app-modal-agregar-app',
@@ -73,6 +75,8 @@ export class ModalAgregarAppComponent {
         return AplicacionAngular.getComandoDeArranquePorDefecto(puerto);
       case TipoAplicacion.SpringBoot:
         return AplicacionSpringBoot.getComandoDeArranquePorDefecto(puerto);
+      case TipoAplicacion.NestJS:
+        return AplicacionNestJS.getComandoDeArranquePorDefecto(puerto);
       case TipoAplicacion.Otra:
         return AplicacionOtra.getComandoDeArranquePorDefecto(puerto);
       default:
@@ -96,23 +100,21 @@ export class ModalAgregarAppComponent {
 
       let app;
       if(this.campoTipo.value == TipoAplicacion.Angular){
-        app = new AplicacionAngular(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService);
+        app = new AplicacionAngular(Aplicacion.nextID++, nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService);
       }
       else if(this.campoTipo.value == TipoAplicacion.SpringBoot){
-        app = new AplicacionSpringBoot(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
+        app = new AplicacionSpringBoot(Aplicacion.nextID++, nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
+      }
+      else if(this.campoTipo.value == TipoAplicacion.NestJS){
+        app = new AplicacionNestJS(Aplicacion.nextID++, nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
       }
       else {
-        app = new AplicacionOtra(nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
+        app = new AplicacionOtra(Aplicacion.nextID++, nombre, Number.parseInt(puerto), ruta, urlTableroTrello, comandoDeArranque, this.electronService, this.aplicacionService)
       }
       
       this.aplicacionService.agregarAplicacion(app)
-      .then( _ => {
-        this.resetearFormulario();
-        this.renderer.selectRootElement(this.btnCerrar.nativeElement, true).click();
-      })
-      .catch(mensajeDeError => {
-        this.mensajeDeError = mensajeDeError;
-      })
+      this.resetearFormulario();
+      this.renderer.selectRootElement(this.btnCerrar.nativeElement, true).click();
     }
     else {
       alert("Formulario inválido.");

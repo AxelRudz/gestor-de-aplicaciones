@@ -4,16 +4,14 @@ import { Terminal } from "./Terminal";
 export class Git {
   
   private rutaRepo: string;
-  private puerto: number;
   private ramaActual: string;
   private ramasDisponibles: string[];
   private ramaActualizada: boolean;
   private electronService: ElectronService;  
   private terminal: Terminal;
 
-  constructor(rutaRepo: string, puerto: number, electronService: ElectronService, terminal: Terminal){
+  constructor(rutaRepo: string, electronService: ElectronService, terminal: Terminal){
     this.rutaRepo = rutaRepo;
-    this.puerto = puerto;
     this.ramaActual = "";
     this.ramasDisponibles = [];
     this.ramaActualizada = true;
@@ -58,11 +56,11 @@ export class Git {
       });
   }
 
-  escucharCambiosRamaActual(): void {
-    this.electronService.send("rama-actual", this.rutaRepo, this.puerto);
-    this.electronService.on(`rama-actual-${this.puerto}`, (event: any, nombre: string) => {        
-      this.ramaActual = nombre;
-    });
+  consultarRamaActual(): Promise<any> {
+    return this.electronService.invoke("rama-actual", this.rutaRepo)
+      .then((ramaActual: string) => {
+        this.ramaActual = ramaActual;
+      });    
   }
 
   consultarRamasDisponibles(): Promise<any> {
@@ -79,13 +77,9 @@ export class Git {
       });
   }
 
-  removeListeners(): void {
-    this.electronService.removeAllListeners(`rama-actual-${this.puerto}`);
-  }
-
   async iniciarTareasAutomaticas(): Promise<void> {
-    this.escucharCambiosRamaActual();
     while (true) {
+      await this.consultarRamaActual();
       await this.consultarRamasDisponibles();
       await this.consultarRamaActualizada();
       await new Promise(resolve => setTimeout(resolve, 10000));

@@ -2,7 +2,7 @@
 Muestra una notificacion en el sistema con titulo, descripcion y un icono
 
 import { Notification } from "electron";
-new Notification({ title: 'Gestor de aplicaciones', body: 'Se ha hecho un commit', icon: './src/assets/logo-app.png' }).show();
+new Notification({ title: 'Gestor de aplicaciones', body: 'Se ha hecho un commit', icon: './src/assets/logo-app2rounded.ico' }).show();
 
 ------------------------------------------------------------------------------------------------------------------------------------
 

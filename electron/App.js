@@ -8,7 +8,7 @@ var convert = new Convert();
 
 const pidsAplicacionesCorriendo = [];
 
-ipcMain.on('iniciar-aplicacion', (event, puerto, ruta, comando) => {
+ipcMain.on('iniciar-aplicacion', (event, idApp, ruta, comando) => {
   // Creo el proceso
   const proceso = spawn(comando, {
     shell: true,
@@ -24,7 +24,7 @@ ipcMain.on('iniciar-aplicacion', (event, puerto, ruta, comando) => {
     if(data){
       console.log(`stdout: ${data}`);
       const mensaje = data ? convert.toHtml(data.toString()) : data.toString()
-      event.sender.send(`iniciar-aplicacion-${puerto}`, pid, mensaje);
+      event.sender.send(`iniciar-aplicacion-${idApp}`, pid, mensaje);
     }
   });
 
@@ -32,7 +32,7 @@ ipcMain.on('iniciar-aplicacion', (event, puerto, ruta, comando) => {
     if(error){
       console.error(`stderr: ${error}`);
       const mensaje = convert.toHtml(error.toString())
-      event.sender.send(`iniciar-aplicacion-${puerto}`, pid, mensaje);
+      event.sender.send(`iniciar-aplicacion-${idApp}`, pid, mensaje);
     }
   });
 });
@@ -59,6 +59,10 @@ ipcMain.handle('detener-aplicacion', (event, pid) => {
 const matarProceso = (pid) => {
   return new Promise((resolve, reject) =>{
     treeKill(pid,'SIGTERM',(err) => {
+      // Si hubo un error porque no encontró el pid, lo tomo como que se borró correctamente.
+      if(err && err.code == 128){
+        resolve(true)
+      }
       resolve(!err)
     });
   });
@@ -87,6 +91,18 @@ ipcMain.handle('abrir-aplicacion-en-visual-studio', (event, ruta) => {
       .catch(error => {
         reject(error)
       });
+  })
+});
+
+ipcMain.handle('abrir-en-navegador', (event, puerto) => {
+  return new Promise((resolve, reject) => {
+    shell.openExternal(`http://localhost:${puerto}`)
+    .then( _ => {
+      resolve(true);
+    })
+    .catch(error => {
+      reject(error);
+    })
   })
 });
 

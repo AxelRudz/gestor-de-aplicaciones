@@ -55,8 +55,8 @@
   },
   "build": {
     "asar": true,
-    "appId": "REPO MANAGER - Platinum Edition",
-    "productName": "REPO MANAGER - Platinum Edition",
+    "appId": "Repo Manager - Platinum Edition",
+    "productName": "Repo Manager - Platinum Edition",
     "files": [
       "dist/**/*",
       "electron/**/*",
@@ -70,8 +70,8 @@
       "target": [
         "nsis"
       ],
-      "icon": "./src/assets/logo-app.png",
-      "artifactName": "REPO MANAGER - Platinum Edition.exe"
+      "icon": "./src/assets/logo-app2rounded.ico",
+      "artifactName": "Repo Manager.exe"
     },
     "nsis": {
       "oneClick": false,
@@ -81,10 +81,10 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "deleteAppDataOnUninstall": true,
-      "shortcutName": "REPO MANAGER - Platinum Edition",
-      "installerIcon": "./src/assets/logo-app.png",
-      "uninstallerIcon": "./src/assets/logo-app.png",
-      "installerHeaderIcon": "./src/assets/logo-app.png"
+      "shortcutName": "Repo Manager",
+      "installerIcon": "./src/assets/logo-app2rounded.ico",
+      "uninstallerIcon": "./src/assets/logo-app2rounded.ico",
+      "installerHeaderIcon": "./src/assets/logo-app2rounded.ico"
     }
   }
 }

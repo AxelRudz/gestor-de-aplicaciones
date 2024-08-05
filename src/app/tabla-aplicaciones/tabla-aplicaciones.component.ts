@@ -42,9 +42,9 @@ export class TablaAplicacionesComponent {
     return app.getPidProceso() != null;
   }
 
-  toggleApp(app: Aplicacion): void {
+  async toggleApp(app: Aplicacion): Promise<void> {
     if(this.estaEnEjecucion(app)){
-      app.detener()
+      await app.detener()
         .then(ok => {          
           this.seInteractuoConUnaApp.emit(app);
         })
@@ -68,6 +68,10 @@ export class TablaAplicacionesComponent {
 
   alMenosUnaAplicacionTieneTrello(): boolean {
     return this.aplicaciones.some(app => app.getUrlTableroTrello());
+  }
+
+  alMenosUnaAplicacionEstaEnEjecucion(): boolean {
+    return this.aplicaciones.some(app => app.estaEnEjecucion());
   }
 
 }

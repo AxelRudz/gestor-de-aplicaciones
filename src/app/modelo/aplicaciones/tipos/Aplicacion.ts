@@ -9,6 +9,9 @@ import { TipoAplicacion } from "src/app/modelo/aplicaciones/enums/TipoAplicacion
 // devuelven el comando de arranque por defecto para iniciar la aplicacion de su clase
 export abstract class Aplicacion {
 
+  static nextID = 0;
+
+  private id: number;
   private nombre: string;
   private puerto: number;
   private ruta: string;
@@ -21,6 +24,7 @@ export abstract class Aplicacion {
   protected aplicacionService: AplicacionService;
 
   constructor(
+    id: number,
     nombre: string,
     puerto: number,
     ruta: string,
@@ -29,6 +33,10 @@ export abstract class Aplicacion {
     electronService: ElectronService,
     aplicacionService: AplicacionService,
   ){
+    // Recibo el ID por parametro, pero de todas formas tengo que llevar un control de cuantas se agregaron
+    // para poder usarlo en el futuro.
+    Aplicacion.nextID++;
+    this.id = id;
     this.nombre = nombre;
     this.puerto = puerto;
     this.ruta = ruta;
@@ -36,29 +44,40 @@ export abstract class Aplicacion {
     this.comandoDeArranque = comandoDeArranque;
     this.pidProceso = null;
     this.terminal = new Terminal();    
-    this.git = new Git(ruta, puerto, electronService, this.terminal);
+    this.git = new Git(ruta, electronService, this.terminal);
     this.electronService = electronService;
     this.aplicacionService = aplicacionService;
+
+    // Suscripcion que usa el iniciar
+    this.electronService.on(`iniciar-aplicacion-${this.id}`, (event: any, pid: number | null, mensaje: string) => {
+      this.pidProceso = pid;
+      this.terminal.agregarMensaje(mensaje);
+      if(pid == null){
+        this.puedeIniciarLaApp = true;
+      }
+    });
   }
+
+  private puedeIniciarLaApp = true;
   
   abstract getTipoAplicacion(): TipoAplicacion;
   abstract getLogoUrl(): string;
 
   iniciar(): void {
-    this.terminal.setMensajes([`Iniciando aplicación...`])
-    this.electronService.send("iniciar-aplicacion", this.puerto, this.ruta, this.comandoDeArranque);
-    this.electronService.on(`iniciar-aplicacion-${this.puerto}`, (event: any, pid: number | null, mensaje: string) => {
-      this.pidProceso = pid;
-      this.terminal.agregarMensaje(mensaje)
-    });
+    if(!this.pidProceso && this.puedeIniciarLaApp){
+      this.puedeIniciarLaApp = false;
+      this.terminal.setMensajes([`Iniciando aplicación...`])
+      this.electronService.send("iniciar-aplicacion", this.id, this.ruta, this.comandoDeArranque);
+    }
   }
 
   async detener(): Promise<boolean> {
     this.terminal.agregarMensaje("Deteniendo aplicación...");
     try {
-      const ok = await this.electronService.invoke("detener-aplicacion", this.pidProceso)
+      const ok = await this.electronService.invoke("detener-aplicacion", this.pidProceso);
       if(ok){
         this.pidProceso = null;
+        this.puedeIniciarLaApp = true;
         this.terminal.agregarMensaje("Aplicación detenida.");
         return true;
       }
@@ -69,12 +88,15 @@ export abstract class Aplicacion {
     this.terminal.agregarMensaje("Error deteniendo la aplicación.");
     return false;
   }
+
+  estaEnEjecucion(): boolean {
+    return this.pidProceso != null;
+  }
   
   eliminar(): void {
     this.detener()
       .then(ok => {
         if(ok){
-          this.getGit().removeListeners();
           this.aplicacionService.eliminarAplicacion(this);
         }
       })
@@ -84,27 +106,29 @@ export abstract class Aplicacion {
   abrirEnIDE(): void {
     this.terminal.agregarMensaje(`Abriendo ${this.nombre} en Visual Studio Code...`);
     this.electronService.invoke("abrir-aplicacion-en-visual-studio", this.ruta)
-    .then( ok => {
-      if(ok){
-        this.terminal.agregarMensaje("Acción finalizada.");
-      }
-    })
     .catch(error => {
-      console.error("Ocurrió un error abriendo la app en Visual Studio Code. Error: ", error)
+      console.error("Ocurrió un error abriendo la aplicación en Visual Studio Code. Error: ", error);
+    });
+  }
+
+  abrirEnNavegador(): void {
+    this.terminal.agregarMensaje(`Abriendo ${this.nombre} en el navegador...`);
+    this.electronService.invoke("abrir-en-navegador", this.puerto)
+    .catch(error => {
+      console.error("Ocurrió un error abriendo la aplicación en el navegador. Error: ", error);
     });
   }
 
   abrirTableroDeTrello(): void {
     this.terminal.agregarMensaje(`Abriendo tablero de ${this.nombre} en el navegador...`);
     this.electronService.invoke("abrir-tablero-de-trello", this.urlTableroTrello)
-    .then( ok => {
-      if(ok){
-        this.terminal.agregarMensaje("Acción finalizada.");
-      }
-    })
     .catch(error => {
       console.error("Ocurrió un error abriendo la app en Visual Studio Code. Error: ", error)
     });
+  }
+
+  getId(): number {
+    return this.id;
   }
 
   getNombre(): string {

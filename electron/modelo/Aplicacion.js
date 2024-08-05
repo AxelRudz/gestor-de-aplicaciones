@@ -1,5 +1,6 @@
 class Aplicacion {
-  constructor(tipo, nombre, ruta, puerto, comandoDeArranque){
+  constructor(id, tipo, nombre, ruta, puerto, comandoDeArranque){
+    this.id = id;
     this.tipo = tipo;
     this.nombre = nombre;
     this.ruta = ruta;

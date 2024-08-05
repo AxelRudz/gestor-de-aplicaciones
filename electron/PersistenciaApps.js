@@ -2,6 +2,18 @@ const { app, ipcMain } = require('electron');
 const fs = require("fs");
 const { matarProceso } = require('./App')
 
+// Antes de iniciar la aplicacion, seteo los ids de cada aplicacion segun el orden que tienen
+// Este ID es el que se usa entre angular y electron para identificar las apps
+const normalizarIdsDeAplicaciones = async () => {
+  let listadoAplicacionesGuardadas = getAplicacionesGuardadas();
+  listadoAplicacionesGuardadas = listadoAplicacionesGuardadas.map((aplicacion, index) => {
+    aplicacion.id = index;
+    return aplicacion;
+  })
+  setAplicacionesGuardadas(listadoAplicacionesGuardadas);
+  return;
+}
+
 
 let cacheAplicacionesGuardadas = [];
 
@@ -24,7 +36,7 @@ ipcMain.handle('persistencia-agregar-aplicacion', (event, aplicacion) => {
   });
 });
 
-ipcMain.handle('persistencia-eliminar-aplicacion', async (event, puerto, pid) => {
+ipcMain.handle('persistencia-eliminar-aplicacion', async (event, idApp, pid) => {
   return new Promise(async (resolve, reject) => {
     if(pid){
       await matarProceso(pid)
@@ -35,7 +47,7 @@ ipcMain.handle('persistencia-eliminar-aplicacion', async (event, puerto, pid) =>
     }
     try {
       const listadoAplicaciones = getCacheAplicacionesGuardadas();
-      const indexApp = listadoAplicaciones.findIndex(aplicacion => aplicacion.puerto == puerto);
+      const indexApp = listadoAplicaciones.findIndex(aplicacion => aplicacion.id == idApp);
       if(indexApp != -1){        
         listadoAplicaciones.splice(indexApp, 1);
       }
@@ -62,7 +74,7 @@ const getAplicacionesGuardadas = () => {
   }
   catch(error){
     console.error("Ocurrió un error obteniendo el listado de aplicaciones guardadas. Error: ", error);
-    throw error;
+    return []
   }
 }
 
@@ -84,5 +96,6 @@ const getCacheAplicacionesGuardadas = () => {
 }
 
 module.exports = {
-  getCacheAplicacionesGuardadas
+  getCacheAplicacionesGuardadas,
+  normalizarIdsDeAplicaciones
 }
