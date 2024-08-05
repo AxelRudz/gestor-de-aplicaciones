@@ -1,3 +1,6 @@
+:: Me posiciono en la carpeta raiz de la aplicacion
+cd %~dp0
+
 :: Cambia a la rama master
 git checkout master
 
@@ -27,10 +30,7 @@ if exist "%SOURCE_PATH%" (
     echo Origen: "%SOURCE_PATH%"
     echo Destino: "%DEST_PATH%"
 ) else (
-    
-    echo Ocurrio un problema al realizar el backup de las aplicaciones guardadas
-    echo Origen: "%SOURCE_PATH%"
-    echo Destino: "%DEST_PATH%"
+    echo El archivo "%SOURCE_PATH%" no existe. No hay necesidad de hacer un backup.
 )
 
 pause
