@@ -54,20 +54,10 @@ export class AplicacionService {
       })
   }
 
-  persistenciaAgregarAplicacion(aplicacion: Aplicacion){
-    const aplicacionParaAgregar: AplicacionElectronDTO = {
-      id: aplicacion.getId(),
-      tipo: aplicacion.getTipoAplicacion(),
-      nombre: aplicacion.getNombre(),
-      ruta: aplicacion.getRuta(),
-      puerto: aplicacion.getPuerto(),
-      urlTableroTrello: aplicacion.getUrlTableroTrello(),
-      comandoDeArranque: aplicacion.getComandoDeArranque()
-    }
-    this.electronService.invoke('persistencia-agregar-aplicacion', aplicacionParaAgregar)
-      .catch(error => {
-        console.error(error);
-      })
+  persistenciaAgregarEditarAplicacion(aplicacion: Aplicacion, accion: "agregar" | "editar"){
+    const app = this.generarAplicacionDTOElectron(aplicacion);
+    const canalElectron = accion == "agregar" ? "persistencia-agregar-aplicacion" : "persistencia-editar-aplicacion"
+    return this.electronService.invoke(canalElectron, app);
   }
 
   persistenciaEliminarAplicacion(aplicacion: Aplicacion): Promise<any>{
@@ -78,9 +68,31 @@ export class AplicacionService {
   }
 
   agregarAplicacion(app: Aplicacion): void {
-    this.persistenciaAgregarAplicacion(app);
-    this.aplicaciones.push(app);
-    this.aplicacionesSubject.next(this.aplicaciones);
+    this.persistenciaAgregarEditarAplicacion(app, "agregar")
+    .then( _ => {
+      this.aplicaciones.push(app);
+      this.aplicacionesSubject.next(this.aplicaciones);
+    })
+    .catch(error => {
+      console.error(error);
+    })
+  }
+
+  editarAplicacion(app: Aplicacion): void {
+    const indexApp = this.aplicaciones.findIndex(aplicacionAgregada => aplicacionAgregada.getId() == app.getId());    
+    if(indexApp != -1){
+      // Si encontramos la aplicación, primero detenemos la app y luego procedemos a pisar los datos con los nuevos
+      this.aplicaciones[indexApp].detener()
+      .then( _ => {
+        this.persistenciaAgregarEditarAplicacion(app, "editar")  
+        .then( _ => {
+          this.aplicaciones[indexApp] = app;
+          this.aplicacionesSubject.next(this.aplicaciones);
+        })
+        .catch(error => console.error("Ocurrió un error editando la aplicacion. Error: ", error))
+      })
+      .catch(error => console.error("Ocurrió un error deteniendo la app para editarla. Error: ", error));
+    }
   }
 
   eliminarAplicacion(aplicacion: Aplicacion){
@@ -105,6 +117,18 @@ export class AplicacionService {
         await aplicacion.detener();
       }
     })
+  }
+
+  private generarAplicacionDTOElectron(aplicacion: Aplicacion): AplicacionElectronDTO {
+    return {
+      id: aplicacion.getId(),
+      tipo: aplicacion.getTipoAplicacion(),
+      nombre: aplicacion.getNombre(),
+      ruta: aplicacion.getRuta(),
+      puerto: aplicacion.getPuerto(),
+      urlTableroTrello: aplicacion.getUrlTableroTrello(),
+      comandoDeArranque: aplicacion.getComandoDeArranque()
+    }
   }
 
 

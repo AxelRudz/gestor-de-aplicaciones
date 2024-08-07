@@ -3,7 +3,7 @@
 <div class="container">
   <div class="d-flex justify-content-center align-items-center my-5">
 
-    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAgregarApp">
+    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAgregarApp" (click)="appElegidaParaEditar = null">
       <i class="fa-solid fa-plus me-2"></i>
       Agregar aplicación
     </button>
@@ -23,10 +23,14 @@
   
   <app-tabla-aplicaciones
     (seInteractuoConUnaApp)="mostrarTerminalDeApp($event)"
+    (quiereEditarUnaApp)="appElegidaParaEditar = $event"
   ></app-tabla-aplicaciones>
   
   <app-terminales-apps [appElegida]="appElegidaParaVerTerminal"></app-terminales-apps>
 </div>
 
 <!-- Modals -->
-<app-modal-agregar-app></app-modal-agregar-app>
+<app-modal-agregar-app
+  [appElegidaParaEditar]="appElegidaParaEditar"
+  (seCerroElModal)="appElegidaParaEditar = null"
+></app-modal-agregar-app>

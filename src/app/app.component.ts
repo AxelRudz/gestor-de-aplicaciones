@@ -15,6 +15,7 @@ export class AppComponent {
   suscripcion!: Subscription;
 
   appElegidaParaVerTerminal: Aplicacion | null = null;
+  appElegidaParaEditar: Aplicacion | null = null;
 
   constructor(private aplicacionService: AplicacionService){}
 

@@ -13,6 +13,7 @@ export class TablaAplicacionesComponent {
 
   // Lo usa el componente Terminal -> Muestra automaticamente la terminal de la última app con la que se interactuó
   @Output() seInteractuoConUnaApp: EventEmitter<Aplicacion> = new EventEmitter<Aplicacion>();
+  @Output() quiereEditarUnaApp: EventEmitter<Aplicacion> = new EventEmitter<Aplicacion>();
 
   aplicaciones: Aplicacion[] = [];
 

@@ -3,8 +3,10 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="modalAgregarAppLabel">Agregar aplicación</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h1 class="modal-title fs-5" id="modalAgregarAppLabel">
+          {{appElegidaParaEditar ? "Editar" : "Agregar"}} aplicación
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cerrarModal()"></button>
       </div>
       <form [formGroup]="formularioAgregarAplicacion" class="modal-body">
 
@@ -75,10 +77,10 @@
 
       </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="agregarAplicacion()" [disabled]="formularioAgregarAplicacion.invalid">
-          Agregar aplicación
+        <button type="button" class="btn btn-primary" (click)="agregarEditarAplicacion()" [disabled]="formularioAgregarAplicacion.invalid">
+          {{appElegidaParaEditar ? "Editar" : "Agregar"}} aplicación
         </button>
-        <button type="button" class="btn btn-secondary" (click)="resetearFormulario()" data-bs-dismiss="modal" #btnCerrar>
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()" data-bs-dismiss="modal" #btnCerrar>
           Cerrar
         </button>
       </div>

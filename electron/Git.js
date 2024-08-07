@@ -27,7 +27,14 @@ ipcMain.handle('ramas-disponibles', (event, ruta) => {
         const listadoDeRamas = await obtenerListadoDeRamasDisponibles(ruta, nombreRamaPrincipal)
         resolve(listadoDeRamas);
       }
-      resolve([]);
+      // Si no es un repositorio remoto
+      else if(stderr.includes("does not appear to be a git repository")){
+        const listadoDeRamasLocales = await obtenerListadoDeRamasDisponibles(ruta, null)
+        resolve(listadoDeRamasLocales);
+      }
+      else {
+        resolve([]);
+      }
     })
   })
 });

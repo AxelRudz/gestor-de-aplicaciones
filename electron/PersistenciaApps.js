@@ -36,6 +36,27 @@ ipcMain.handle('persistencia-agregar-aplicacion', (event, aplicacion) => {
   });
 });
 
+// Formato (event: any, aplicacion: Aplicacion)
+ipcMain.handle('persistencia-editar-aplicacion', (event, aplicacion) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const aplicacionesGuardadas = getCacheAplicacionesGuardadas();
+      const indexAppEditar = aplicacionesGuardadas.findIndex(appGuardada => appGuardada.id == aplicacion.id);
+      if(indexAppEditar != -1){
+        aplicacionesGuardadas[indexAppEditar] = aplicacion;
+        setAplicacionesGuardadas(aplicacionesGuardadas)
+        resolve(true);
+      }
+      else {
+        reject("No existe una aplicación con ese ID");
+      }
+    }
+    catch(error){
+      reject(error);
+    }
+  });
+});
+
 ipcMain.handle('persistencia-eliminar-aplicacion', async (event, idApp, pid) => {
   return new Promise(async (resolve, reject) => {
     if(pid){
