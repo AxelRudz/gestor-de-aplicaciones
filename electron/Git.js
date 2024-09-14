@@ -78,11 +78,14 @@ ipcMain.handle('git-checkout', (event, ruta, rama) => {
 });
 
 function obtenerListadoDeRamasDisponibles(ruta, ramaPrincipal){
+  // Esto lo saco porque si hacia un merge de desarrollo a master no podia volver a ver la rama desarrollo hasta que no tenga un commit que no este en master
   // Si el repo tiene una rama principal, me traigo las ramas que no estan mergeadas a esa rama
   // Sino me traigo todas las ramas
-  const comando = ramaPrincipal
-    ? `cd ${ruta} && git branch --all --no-merged ${ramaPrincipal.trim()}`
-    : `cd ${ruta} && git branch --all`
+  // const comando = ramaPrincipal
+  //  ? `cd ${ruta} && git branch --all --no-merged ${ramaPrincipal.trim()}`
+  //  : `cd ${ruta} && git branch --all`
+
+  const comando = `cd ${ruta} && git branch --all`;
 
   return new Promise((resolve, reject) => {
     execPromise(comando, (error, stdout, stderr) => {
